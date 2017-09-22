@@ -1,0 +1,43 @@
+# THIS TEXT CAN BE PASTED INTO THE ~/.bashrc FILE OF THE USER
+# change indiek_PATH to the appropriate folder where your indiek shell scripts 
+# reside
+
+# indiek
+indiek_PATH="/home/radillo/Git/GitHub/IndieK/shell_scripts/functions"
+if [ -d "$indiek_PATH/" ]; then
+    # CONSTANTS
+    current_db_name=$( grep database ~/.my.cnf | sed 's/database=\(.*\)/\1/g' )
+    indiek_base_folder="${HOME}/.indiek/$current_db_name"
+    indiek_tmp="${HOME}/.indiek/tmp"
+    indiek_images="$indiek_base_folder/images" 
+
+    # This uses EDITOR as editor, or vi if EDITOR is null or unset
+    EDITOR=${EDITOR:-vi}
+    # auxiliary functions
+    source $indiek_PATH/die.sh
+    source $indiek_PATH/get_supratopics.sh
+    source $indiek_PATH/get_subtopics.sh
+    source $indiek_PATH/istopic.sh
+    source $indiek_PATH/setindiekdb.sh
+    
+    # main commands functions
+    source $indiek_PATH/t.sh
+    source $indiek_PATH/i.sh
+    source $indiek_PATH/topic.sh
+    source $indiek_PATH/newtopic.sh
+    source $indiek_PATH/nt.sh
+    source $indiek_PATH/ntx.sh
+    source $indiek_PATH/showtopic.sh
+    source $indiek_PATH/sub.sh
+    source $indiek_PATH/subtopic.sh
+    source $indiek_PATH/compile.sh
+    source $indiek_PATH/gr.sh
+    source $indiek_PATH/grt.sh
+    source $indiek_PATH/searchitem.sh
+    source $indiek_PATH/intopic.sh
+    source $indiek_PATH/notintopic.sh
+    source $indiek_PATH/searchtopic.sh
+    source $indiek_PATH/edititem.sh
+    source $indiek_PATH/deleteitem.sh
+    source $indiek_PATH/showitem.sh
+fi
