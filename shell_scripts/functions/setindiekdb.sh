@@ -34,6 +34,15 @@ setindiekdb ()
             else
                 echo "db name replacement failed"
             fi
+        elif [ "$1" == "indiekdb" ]; then
+            sed -i.bak 's/database=.*/database=indiekdb/g' ~/.my.cnf
+            chmod 600 ~/.my.cnf.bak
+            if [ $? -eq 0 ]; then
+                echo "'~/.my.cnf' database set to 'indiekdb'"
+                update_indiek_env
+            else
+                echo "db name replacement failed"
+            fi
         else
             echo "wrong arguments"
         fi
