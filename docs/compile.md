@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Compile a LaTeX item -- `compile`
+# compile -- Compile a LaTeX item
 ## Description
 Compiles with shell command `pdflatex` an item which has the Latex field
 set to 1 in the database.

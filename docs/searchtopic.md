@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Search for a topic -- `searchtopic`
+# searchtopic -- Search for a topic
 ## Description
 To search for a topic.
 ## Syntax

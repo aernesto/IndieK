@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Insert new text -- `nt`
+# nt -- Insert new text
 ## Description
 Inserts a new 'idea' into IndieK's database. A simple text in
 IndieK is called an _item_.

@@ -1,4 +1,5 @@
-# Investigate -- `i`
+[back to table of contents](/index.md)
+# i -- Investigate
 ## Description
 To get some extra information about an item or a topic.
 ## Syntax

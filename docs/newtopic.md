@@ -1,8 +1,8 @@
 [back to table of contents](/index.md)
-# Create new topic -- `newtopic`
+# newtopic -- Create new topic
 ## Description
 To insert new topic into database.
-In km, items may be grouped into _topics_.
+In IndieK, items may be grouped into _topics_.
 note that nothing prevents the same item from belonging to distinct topics.
 ## Syntax
 `newtopic "<topic name>" "<topic description>"`

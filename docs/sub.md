@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Subordinate an item to another -- `sub`
+# sub -- Subordinate an item to another
 ## Description
 To insert a directed link between two items. The source item is called \emph{parent} and the target item the \emph{child}.
 ## Syntax

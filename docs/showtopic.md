@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Show text content of a topic's items -- `showtopic`
+# showtopic -- Show text content of a topic's items
 ## Description
 Displays on command line the items IDs and content contained in the topic.
 ## Syntax

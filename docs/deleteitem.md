@@ -1,4 +1,5 @@
-# Delete item -- `deleteitem`
+[back to table of contents](/index.md)
+# deleteitem -- Delete item
 ## Description
 Deletes _fully_ an item from the database. Handles automatically all the dependencies of this item on the other items and topics.
 ## Syntax

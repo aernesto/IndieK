@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Insert new LaTeX item -- `ntx`
+# ntx -- Insert new LaTeX item
 ## Description
 To insert new idea into database, that is written in the
 LaTeX language.

@@ -1,4 +1,5 @@
-# Display text from item -- `t`
+[back to table of contents](/index.md)
+# t -- Display text from item
 ## Description
 To display content of an existing item.
 ## Syntax

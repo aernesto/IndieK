@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Edit text from existing item -- `edititem`
+# edititem -- Edit text from existing item
 ## Description
 To edit the text content of an existing item (possibly a $$\LaTeX$$ item)
 ## Syntax

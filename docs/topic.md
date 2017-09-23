@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Add item to topic/explore topic -- `topic`
+# topic -- Add item to topic/explore topic
 ## Description
 This function has several purposes:
 - Without arguments, it lists all existing topics with their description and level. 

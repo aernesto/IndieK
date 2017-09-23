@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Subordinate a topic to another -- `subtopic`
+# subtopic -- Subordinate a topic to another
 ## Description
 Defines an existing topic as a subset of another topic. The 
 included topic is called _subtopic_ and the containing

@@ -1,5 +1,5 @@
 [back to table of contents](/index.md)
-# Search for an item -- `searchitem`
+# searchitem -- Search for an item
 ## Description
 To search for items in the database.
 ## Syntax
