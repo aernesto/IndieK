@@ -1,12 +1,11 @@
-# nt
-'newtext'
+# nt -- 'newtext'
 ## Description
 Inserts a new 'idea' into IndieK's database. A simple text in
 IndieK is called an _item_.
 ## Syntax
-`nt "some string"`  
+```nt "some string"```  
 OR  
-`nt -a "some string"`
+```nt -a "some string"```
 ## Examples of use
 ```
 nt "my new idea"
