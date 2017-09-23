@@ -13,3 +13,8 @@ Full documentation is available on the App's [website](https://aernesto.github.i
 
 ## Contribute
 IndieK _needs_ you! Apply to the [mailing list](https://groups.google.com/forum/#!forum/indiek) in order to _ask questions_ and _offer suggestions_.
+
+## To come...
+Stay put for:
+- ROADMAP.md
+- USE_CASES.md
