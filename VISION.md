@@ -1,0 +1,13 @@
+The following is a list of the values that IndieK is built upon
+- Develop an intelligent digital assistant with which the user can communicate in natural language. One source of inspiration is the fictional [JARVIS](https://www.youtube.com/watch?v=Wx7RCJvoCMc) program from the _Iron Man_ movies.  
+- Promote learning via the use of metacognition  
+- Promote learning via the use of metacognition  
+- Promote debating via the use of metacognition  
+- Promote scientific skepticism  
+- Promote philosophical skepticism  
+- Promote creation of objective knowledge  
+- Promote creation of public knowledge  
+- Foster questioning and curiosity  
+- Use machines as cognitive prosthetics to enhance our capacities, e.g. memory and metacognition (organization of one's own thoughts)  
+- Seamless integration between machines and human cognition  
+- Provide easy access to formal mathematical knowledge to the layman
