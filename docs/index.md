@@ -6,7 +6,7 @@ As you may know, IndieK is still an _embryo_! This why we need your feedback!
 
 Any question or remark about this documentation, or about the IndieK software? [Apply](https://groups.google.com/forum/#!forum/indiek) to join the mailing list and ask or comment away!
 
-If you want to contribute to IndieK, see our [Contribute](https://github.com/aernesto/IndieK/blob/master/README.md) section.
+If you want to contribute to IndieK, see our [Contribute](https://github.com/aernesto/IndieK/blob/master/README.md#contribute) section.
 
 # Documentation table of contents
 
