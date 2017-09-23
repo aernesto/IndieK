@@ -5,14 +5,27 @@ Make sure, **first** that your computer posseses the commands and softwares list
 
 ## Prerequisites
 
-I write (command line) when the command must be available from bash shell. 
-- `pdflatex` (command line)
-- `convert` (command line)  
-This is a command from the ImageMagick package. To install the latter, type the following on Fedora 26:
+IndieK requires the following list of commands to be available from bash shell. 
+- `pdflatex` 
+- `convert`   
+This is a command from the [ImageMagick](https://www.imagemagick.org/script/index.php) package. To install the latter, type the following on Fedora 26:
 ```
 sudo dnf install ImageMagick
 ```
-- LaTeX class/package `standalone`   
+- `mysql` 
+The Free Software version of this command is called [MariaDB](https://fedoraproject.org/wiki/MariaDB).
+- `dot`  
+This is part of the [graphviz](http://www.graphviz.org/) software.
+```
+sudo apt-get install graphviz
+```
+or on Fedora 26  
+```
+sudo dnf install graphviz
+```
+
+- `standalone`   
+This is a [LaTeX class](https://www.ctan.org/pkg/standalone?lang=en), **not** a bash command.
 ```
 sudo apt-get install texlive-latex-extra
 ```
@@ -23,17 +36,6 @@ tlmgr install standalone
 or if you are using Fedora 26:
 ```
 sudo dnf install "tex(standalone.cls)"
-```
-- `mysql` (command line)  
-To install the free version of this command on Fedora 26, follow this [link](https://fedoraproject.org/wiki/MariaDB).
-- `dot` (command line)  
-this is part of the graphviz software.
-```
-sudo apt-get install graphviz
-```
-or on Fedora 26  
-```
-sudo dnf install graphviz
 ```
 
 Optionally, you may want to install a software that allows you to open a `.png` image file from the command line.
