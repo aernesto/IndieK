@@ -14,6 +14,8 @@ Full documentation is available on the App's [website](https://aernesto.github.i
 ## Contribute
 IndieK _needs_ you! Apply to the [mailing list](https://groups.google.com/forum/#!forum/indiek) in order to _ask questions_ and _offer suggestions_.
 
+As of today, the core contributors to IndieK are [@eradillo](https://github.com/eradillo) (whom I can't thank warmly enough for his time and dedication), and myself :D
+
 ## To come...
 Stay put for:
 - ROADMAP.md
