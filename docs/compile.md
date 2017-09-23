@@ -1,3 +1,4 @@
+[back to table of contents](/index.md)
 # Compile a LaTeX item -- `compile`
 ## Description
 Compiles with shell command `pdflatex` an item which has the Latex field

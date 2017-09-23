@@ -1,3 +1,4 @@
+[back to table of contents](/index.md)
 # Insert new LaTeX item -- `ntx`
 ## Description
 To insert new idea into database, that is written in the
