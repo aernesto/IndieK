@@ -12,7 +12,7 @@ This is a command from the [ImageMagick](https://www.imagemagick.org/script/inde
 ```
 sudo dnf install ImageMagick
 ```
-- `mysql` 
+- `mysql`  
 The Free Software version of this command is called [MariaDB](https://fedoraproject.org/wiki/MariaDB).
 - `dot`  
 This is part of the [graphviz](http://www.graphviz.org/) software.
