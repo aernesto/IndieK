@@ -1,6 +1,10 @@
 Welcome to IndieK's documentation website!
 
-Any question about the software? [Apply](https://groups.google.com/forum/#!forum/indiek) to join the mailing list and ask away!
+_Current version of IndieK is 0.1.0_
+
+As you may know, IndieK is still an _embryo_! This why we need your feedback! 
+
+Any question or remark about this documentation, or about the IndieK software? [Apply](https://groups.google.com/forum/#!forum/indiek) to join the mailing list and ask or comment away!
 
 If you want to contribute to IndieK, see our [Contribute](https://github.com/aernesto/IndieK/blob/master/README.md) section.
 
@@ -8,7 +12,7 @@ If you want to contribute to IndieK, see our [Contribute](https://github.com/aer
 
 [Installation](/installation.md)  
 Command list  
-    - [nt](/nt.md)
+    [nt](/nt.md)
     - [t](/t.md)
     - [i](/i.md)
     - [ntx](/ntx.md)
