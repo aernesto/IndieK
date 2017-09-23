@@ -1,7 +1,11 @@
 [back to table of contents](/index.md)
 # Installation
 The following are instructions to install IndieK v0.1.0 on a Linux machine (currently tested on Fedora 26).
-Make sure, **first** that your computer posseses the commands and softwares listed in the section below.
+As of now, the installation of IndieK is tedious. We are working hard on improving this aspect. Bare with us please!
+
+Since IndieK relies on many other existing Free Softwares, the hard part of the installation currently lies in resolving all the dependencies by hand. So, **before** installing IndieK, make sure that your computer posseses all the commands and softwares listed in the section below.
+
+If you have any suggestions to improve IndieK's installation process, please write a post on the [Mailing List](https://groups.google.com/forum/#!forum/indiek).
 
 ## Prerequisites
 
