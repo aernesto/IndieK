@@ -1,6 +1,5 @@
-TEST 2 MODIF
+Welcome to IndieK's documentation website!
 
-[some link](https://github.com/aernesto/IndieK)
+Below is a quick introduction. Thorough documentation can be found [here](/docs/installation.md).
 
-# Some main title
-Some **content**
+...README CONTENT HERE...
