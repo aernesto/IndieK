@@ -38,3 +38,4 @@ Command list
     - [showitem](/showitem.md)
     - [intopic](/intopic.md)
     - [notintopic](/notintopic.md)
+    - [setindiekdb](/setindiekdb.md)
