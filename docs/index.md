@@ -1,3 +1,5 @@
+![Itemsgraph](/images/my_first_topic.png)
+
 Welcome to IndieK's documentation website!
 
 _Current version of IndieK is 0.1.0_
