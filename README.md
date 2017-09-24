@@ -1,6 +1,8 @@
 # IndieK
 A Free Software to manage your thoughts and documents!
 
+![Itemsgraph](/docs/images/my_first_topic.png)
+
 ## What IndieK is about
 IndieK is currently in its _embryonic_ stage of development. There is, therefore, a huge gap between what it is and what it aims to be. This software aims to enhance individual cognitive capabilities. It focuses on helping its users handle digital information.
 
