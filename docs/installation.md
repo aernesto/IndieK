@@ -64,22 +64,22 @@ Otherwise, you may follow the following steps:
    machine in which you cloned the GitHub repo.**
 2. Create the hidden base directory .indiek, together with its tmp/
    subdirectory, in your HOME directory. To do this automatically, you may use
-   the create\_indiek\_tree.sh script as follows:  
+   the create_indiek_tree.sh script as follows:  
    ```  
-   cd /PATH/TO/IndieK/shell\_scripts/scripts/  
-   ./create\_indiek\_tree.sh
+   cd /PATH/TO/IndieK/shell_scripts/scripts/  
+   ./create_indiek_tree.sh
    ``` 
 3. Create the MySQL database and tables required by IndieK:  
    ```  
    mysql --user=root -p
    CREATE DATABASE indiekdb;
    USE indiekdb;
-   source /PATH/TO/IndieK/SQL\_scripts/SQL\_TABLES\_CREATION.txt;
-   GRANT ALL PRIVILEGES ON indiekdb.* to YOUR_MySQL_USERNAME WITH GRANT OPTION;
+   source /PATH/TO/IndieK/SQL_scripts/SQL_TABLES_CREATION.txt;
+   GRANT ALL PRIVILEGES ON indiekdb.* to 'YOUR_MySQL_USERNAME'@'localhost' WITH GRANT OPTION;
    quit
    ```  
 4. Add the newly created MySQL database to the config folder of IndieK. For
-   this, just run the add\_indiekdb.sh from IndieK's installation folder:  
+   this, just run the add_indiekdb.sh from IndieK's installation folder:  
    ```
    cd /PATH/TO/IndieK/shell_scripts/scripts
    ./add_indiekdb.sh  
@@ -107,7 +107,7 @@ Otherwise, you may follow the following steps:
 8. Modify your .bashrc file in your HOME directory, in order to automatically
    load IndieK's functions every time you open a Shell session. The content
    that you should add to your .bashrc file is contained in the
-   indiek\_bashrc.txt file from IndieK's installation folder. I copy the
+   indiek_bashrc.txt file from IndieK's installation folder. I copy the
    content here for convenience (this is only true for v0.1.0):
    ```  
    # indiek
@@ -157,6 +157,6 @@ fi
 
 By now, each time you start a Shell session, all the IndieK commands will be readily accessible! Congratulations!
 
-You may post any question about this (tedious) installation process on
-https://groups.google.com/indiek/#!forum/indiek, and any bug or issue may be
-reported on GitHub.
+You may post any question about this (tedious) installation process on the
+[Google group](https://groups.google.com/forum/#!forum/indiek), and any bug or issue may be
+reported on [GitHub](https://github.com/aernesto/IndieK/issues).
