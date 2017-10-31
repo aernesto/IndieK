@@ -3,7 +3,7 @@
 The following are instructions to install IndieK v0.1.0 on a Linux machine (currently tested on Fedora 26).
 As of now, the installation of IndieK is tedious. We are working hard on improving this aspect. Bare with us please!
 
-Since IndieK relies on many other existing Free Softwares, the hard part of the installation currently lies in resolving all the dependencies by hand. So, **before** installing IndieK, make sure that your computer posseses all the commands and softwares listed in the section below.
+Since IndieK relies on many other existing free software packages, the hard part of the installation currently lies in resolving all the dependencies by hand. So, **before** installing IndieK, make sure that your computer posseses all the commands and packages listed in the section below.
 
 If you have any suggestions to improve IndieK's installation process, please write a post on the [Mailing List](https://groups.google.com/forum/#!forum/indiek).
 
@@ -17,11 +17,11 @@ This is a command from the [ImageMagick](https://www.imagemagick.org/script/inde
 sudo dnf install ImageMagick
 ```
 - `mysql`  
-The Free Software version of this command is called [MariaDB](https://fedoraproject.org/wiki/MariaDB).
+The free software version of this command is called [MariaDB](https://fedoraproject.org/wiki/MariaDB).
 A good step-by-step guide to install and configure MariaDB on Fedora 26 is [this
 link](https://fedoraproject.org/wiki/MariaDB).
 - `dot`  
-This is part of the [graphviz](http://www.graphviz.org/) software.
+This is part of the [graphviz](http://www.graphviz.org/) package.
 ```
 sudo apt-get install graphviz
 ```
@@ -44,7 +44,7 @@ or if you are using Fedora 26:
 sudo dnf install "tex(standalone.cls)"
 ```
 
-Optionally, you may want to install a software that allows you to open a `.png` image file from the command line.
+Optionally, you may want to install an application that allows you to open a `.png` image file from the command line.
 On Fedora 26, I personally use [`feh`](https://feh.finalrewind.org/).
 
 ## Installing IndieK
