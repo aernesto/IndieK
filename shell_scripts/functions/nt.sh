@@ -7,7 +7,7 @@ if [ $# -gt 2 ]; then
   return 1;
 elif [ $# -eq 0 ] #if no argument is passed
 then
-  # TO IMPROVE: If several users write simultaneously to the table, then the code 
+  # TO IMPROVE: If several users write simultaneously to the table, then the code
   # below is not enough to return the ID of the last item modified by the Current user
   mysql --defaults-file=~/.my.cnf -e "SELECT ItemID AS 'Last modified Item', LastModifDate AS 'Modification date'\
 					 FROM Items ORDER BY LastModifDate DESC LIMIT 1;"
@@ -21,10 +21,10 @@ then
     mysql --defaults-file=~/.my.cnf -e "set @content='${STRING}';
 					SET @lastitem=(SELECT ItemID FROM Items ORDER BY LastModifDate DESC LIMIT 1);
 					UPDATE Items
-					# the CHAR(10) corresponds to a newline character on UNIX. Probably need CHAR(13) on Windows...	
-					SET Content = CONCAT(Content,CHAR(10),@content) 
+					# the CHAR(10) corresponds to a newline character on UNIX. Probably need CHAR(13) on Windows...
+					SET Content = CONCAT(Content,CHAR(10),@content)
 					WHERE ItemID = @lastitem;
-					SELECT ItemID AS 'New content added to item' FROM Items WHERE ItemID = @lastitem;"  
+					SELECT ItemID AS 'New content added to item' FROM Items WHERE ItemID = @lastitem;"
   #check whether a project name was passed after the <STRING> argument
   else
     echo "error: wrong syntax." >&2
@@ -36,7 +36,7 @@ else
 					 SET @content='${STRING}';\
 					INSERT INTO Items (Author, Content)\
 					VALUES (@author,@content);\
-					SELECT ItemID AS 'New item created'\
+					SELECT ItemID AS 'New item created' , Content\
 					 FROM Items ORDER BY CreationDate DESC LIMIT 1;"
 fi
 }
