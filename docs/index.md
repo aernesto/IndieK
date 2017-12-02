@@ -11,7 +11,7 @@ For general information about this application, check out:
 - this [Youtube playlist](https://www.youtube.com/watch?v=XSA4KEFhVLk&list=PLJhmxsk-_V30bt1XSgXav3dLp0qyEegnD)
 - this [blog](https://adrianblogtech.wordpress.com/)
 
-Any question or remark about this documentation, or about IndieK? [Apply](https://groups.google.com/forum/#!forum/indiek) to join the mailing list and ask or comment away!
+Any question or remark about this documentation, or about IndieK? Apply to join the [mailing list](https://groups.google.com/forum/#!forum/indiek) and ask or comment away!
 
 If you want to contribute to IndieK, see our [Contribute](https://github.com/aernesto/IndieK/blob/master/README.md#contribute) section.
 
