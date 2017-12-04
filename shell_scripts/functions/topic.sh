@@ -3,13 +3,13 @@ topic ()
 # Copied from topic.sh, commit 65466dd
 # THIS SCRIPT DOES NOT CREATE NEW PROJECTS
 
-# TO IMPROVE: 
-#     1. Feedback messages are not completely consistent. For instance, if item 
+# TO IMPROVE:
+#     1. Feedback messages are not completely consistent. For instance, if item
 #     4 is already in one of the topics, the message that 4 got added still prompts...
-#     possible solution is to move the if statement containing that prompt inside the 
+#     possible solution is to move the if statement containing that prompt inside the
 #     preceding for loop... but this would prompt many feedback lines on the console...
 #
-#     2. I don't know how to use my syntax: read -ra <array name> <<< $(mysql...) 
+#     2. I don't know how to use my syntax: read -ra <array name> <<< $(mysql...)
 #         while declaring the array as local
 
 # a first argument --recurs sets the script in recurs mode and skips many checks
@@ -23,7 +23,7 @@ then
 #   echo "items="
 #   echo "$items"
   #for loop that extracts the last argument
-  for lastArg; do 
+  for lastArg; do
     true;
   done
   local topicName="$lastArg"
@@ -38,10 +38,10 @@ then
 #   if [ -z ${array_supratopics+x} ]; then
 #     echo "array was set"
 #     unset $array_supratopics
-#   fi 
+#   fi
   local array_supratopics=()
   while read line
-  do 
+  do
     array_supratopics+=("$line")
   done < <(mysql --defaults-file=~/.my.cnf -Nse "${query}")
 
@@ -56,13 +56,13 @@ then
                               UPDATE Topics SET LastModifDate = CURRENT_TIMESTAMP WHERE TopicID = @topicid;"
     done
     # display added item number if mysql query was succesful
-    if [ $? -eq 0 ]; then 
-      echo "added items:" $items "to topic" $topicName; 
+    if [ $? -eq 0 ]; then
+      echo "added items:" $items "to topic" $topicName;
     else
       return 1;
     fi
   # if the list of supra topics is non-empty, call the script recursively on each supra topic and each item id
-  else 
+  else
  #    echo "array of supra topics non-empty:"
  #    echo "${array_supratopics[@]}"
     for topic_id in "${array_supratopics[@]}"; do
@@ -83,8 +83,8 @@ then
                               UPDATE Topics SET LastModifDate = CURRENT_TIMESTAMP WHERE TopicID = @topicid;"
     done
     # display added item number if mysql query was succesful
-    if [ $? -eq 0 ]; then 
-      echo "added items:" $items "to topic" $topicName; 
+    if [ $? -eq 0 ]; then
+      echo "added items:" $items "to topic" $topicName;
     else
       return 1;
     fi
@@ -110,9 +110,9 @@ else
     else
     mysql --defaults-file=~/.my.cnf -Nsse "SET @topicname=\"${1}\";\
             SET @topicid = (SELECT TopicID FROM Topics WHERE TopicName = @topicname);\
-            SELECT ItemID AS 'Items' FROM TopicsElements\
-            WHERE TopicID = @topicid\
-            ORDER BY ItemID;" 
+            SELECT Items.ItemID AS 'Items', left(Items.Content,25) FROM TopicsElements, Items\
+            WHERE TopicID = @topicid and TopicsElements.ItemID=Items.ItemID\
+            ORDER BY Items.ItemID;"
     fi
 
   # if more than 1 argument are given:
@@ -121,7 +121,7 @@ else
     #array of all arguments but last one:
     local items=${@:1:$(($#-1))}
     #for loop that extracts the last argument
-    for lastArg; do 
+    for lastArg; do
       true;
     done
     # check that the last argument is an existing topic
@@ -141,7 +141,7 @@ else
             echo "error: item $argument doesn't exist" >&2
             return 1;
           fi
-        else 
+        else
           echo "---$argument---"
           echo "error: wrong syntax. All arguments before topic name must be Item IDs" >&2
           return 1;
@@ -152,15 +152,15 @@ else
       local query2="SET @topicid=(SELECT TopicID FROM Topics WHERE TopicName=\"${topicName}\");\
                           SELECT SupraTopicID FROM topic_relation_1\
                           WHERE SubTopicID = @topicid;"
-                          
+
 #       # unset array if already exists
 #       if [ -z ${array_supratopics+x} ]; then
 #         echo "array was set"
 #         unset $array_supratopics
-#       fi 
+#       fi
       local array_supratopics=()
       while read line2
-      do 
+      do
         array_supratopics+=("$line2")
       done < <(mysql --defaults-file=~/.my.cnf -Nse "${query2}")
 
@@ -174,14 +174,14 @@ else
                                   UPDATE Topics SET LastModifDate = CURRENT_TIMESTAMP WHERE TopicID = @topicid;"
         done
         # display added item number if mysql query was succesful
-        if [ $? -eq 0 ]; then 
-          echo "added items:" $items "to topic" $topicName; 
+        if [ $? -eq 0 ]; then
+          echo "added items:" $items "to topic" $topicName;
         else
           return 1;
         fi
       # if the list of supra topics is non-empty, call the script recursively on each supra topic and update current topic
-      else 
-      
+      else
+
 #      echo "array of supra topics"
 #      echo "${array_supratopics[@]}"
         for topic_id in "${array_supratopics[@]}"; do
@@ -197,8 +197,8 @@ else
                                   UPDATE Topics SET LastModifDate = CURRENT_TIMESTAMP WHERE TopicID = @topicid;"
         done
         # display added item number if mysql query was succesful
-        if [ $? -eq 0 ]; then 
-          echo "added items:" $items "to topic" $topicName; 
+        if [ $? -eq 0 ]; then
+          echo "added items:" $items "to topic" $topicName;
         else
           return 1;
         fi
