@@ -19,7 +19,8 @@ Core developers as of today are Adrian Radillo and Ernesto Radillo (yes, the lat
 We need developers with knowledge in one of the following fields. If you are one of them and like IndieK’s vision, please fork our repo and start coding, following our guidelines. You may start a pull request at any time to ask questions or submit your work for review.
 
 - Python GUI specialist (especially for freehand drawings)
-- Computer vision / OCR Python specialist
+- Computer vision / OCR Python specialist  
+
 # Current architecture of IndieK
 ![Arch](/images/IndieK_arch_0.1.0.png)
 
