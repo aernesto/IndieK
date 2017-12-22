@@ -14,9 +14,12 @@ Currently, IndieK runs on Linux and Mac OS X, relying primarily on bash and MySQ
 Full documentation is available on the app's [website](https://aernesto.github.io/IndieK/).
 
 ## Contribute
-IndieK _needs_ you! Apply to the [mailing list](https://groups.google.com/forum/#!forum/indiek) in order to _ask questions_ and _offer suggestions_.
+IndieK _needs_ you! Apply to the [mailing list](https://groups.google.com/forum/#!forum/indiek) in order to _ask questions_ and _offer suggestions_. 
 
-As of today, the core contributors to IndieK are [@eradillo](https://github.com/eradillo) (whom I can't thank warmly enough for his time and dedication), and myself :D
+If you are a developer, you may fork this repo and open a pull request for each contribution you make. Read the [roadmap](https://github.com/aernesto/IndieK/blob/master/docs/roadmap.md)  
+document to get a feel of where we are headed, and get in touch with us through the mailing list!
+
+As of today, the core contributors to IndieK are [@eradillo](https://github.com/eradillo) and myself.
 
 ## To come...
 Stay put for:
