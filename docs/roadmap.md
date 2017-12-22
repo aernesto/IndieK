@@ -1,19 +1,17 @@
 # ROADMAP
-This document sets the official future development goals of *IndieK* *v0.1.0*
-**Date:** October 13, 2017 
-**Authors:** Adrian Radillo, Ernesto Radillo
+This document sets the official future development goals of *IndieK* *v0.1.0*  
+**Date:** December 22, 2017   
+**Author:** Adrian Ernesto Radillo  
 
 # Vision
 
-See this [excerpt](https://youtu.be/PJqbivkm0Ms) from Minority Report.
+This is a link to the [VISION.md](https://github.com/aernesto/IndieK/blob/5e8323d09fed119220dab3e7fbe8ec622af0c906/VISION.md) document.
 
 # Development
 
-Core developers as of October 13, 2017 are Adrian Radillo and Ernesto Radillo.
+Core developers as of today are Adrian Radillo and Ernesto Radillo (yes, the latter is the father of the former).
 
-Disclaimer: Because IndieK is a FOSS, we greatly encourage public debate and discussions about IndieK’s development and design questions. However, as head developers of the project, we (the authors of this document) make all the final decisions about the IndieK’s official directions of development. Of course, we shall always justify our decisions publicly, as best as we can.
-
-See the contributing section (pas encore ecrite) for more about our procedure for merging pull requests to the project.
+Disclaimer: Because IndieK is a FOSS, we greatly encourage public debate and discussions about IndieK’s development and design questions. However, as head developer of the project, I (the author of this document) make all the final decisions about the IndieK’s official directions of development. Of course, I shall always justify my decisions publicly, as best as I can.
 
 # Needed collaborators
 
@@ -22,8 +20,7 @@ We need developers with knowledge in one of the following fields. If you are one
 - Python GUI specialist (especially for freehand drawings)
 - Computer vision / OCR Python specialist
 # Current architecture of IndieK
-
-Mettre le dessin dont nous avons parle.
+(image will come soon)
 
 # Immediate development goals
 ## 1. Port existing code to Python
