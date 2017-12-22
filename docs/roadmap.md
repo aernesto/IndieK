@@ -134,11 +134,11 @@ A GUI development tool must be chosen. PyQt5?
 **OCR**  
 The main goal is to convert:  
 - handwritten letters to their UTF-8 counterpart  
-- handwritten mathematical symbols to their $$\LaTeX$$ counterpart  
+- handwritten mathematical symbols to their LaTeX counterpart  
 
 A pre-processing of the image, before the actual OCR operation, will be needed. Ideally we seek automatic image segmentation, where the different parts of the handwriting area are classified into one of the following:  
 - word sequence → UTF-8  
-- mathematical expression → $$\LaTeX$$  
+- mathematical expression → LaTeX  
 - freehand drawing → Possible image file OR vector graphics file  
 - noise / unclassified
 
