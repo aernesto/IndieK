@@ -168,5 +168,5 @@ IndieK should also facilitate the publication process. A quickly attainable goal
 
 ## 6. Write new functions for IndieK
 
-**To-do module**
+**To-do module**  
 We want to incorporate into IndieK a functionality for handling TO-DO lists.
