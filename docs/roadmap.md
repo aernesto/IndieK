@@ -20,7 +20,7 @@ We need developers with knowledge in one of the following fields. If you are one
 - Python GUI specialist (especially for freehand drawings)
 - Computer vision / OCR Python specialist
 # Current architecture of IndieK
-(image will come soon)
+![Arch](/images/IndieK_arch_0.1.0.png)
 
 # Immediate development goals
 ## 1. Port existing code to Python
