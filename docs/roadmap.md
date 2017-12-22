@@ -153,10 +153,10 @@ We want to develop the support for IndieK to the following widely used SQL frame
 
 Recall that the FOSS nature of IndieK restricts our choice of databases to pure FOSS (AGPL 3 compatible).
 
-A promising module for SQL is [*dataset*](https://github.com/pudo/dataset) **(I started using it with PostgreSQL for school).
+A promising module for SQL is [*dataset*](https://github.com/pudo/dataset) (I started using it with PostgreSQL for school).
 
 **Start experimenting with NoSQL**  
-We also want to start experimenting with NoSQL databases, to comparatively weigh the benefits and drawbacks with SQL, as far as IndieK’s goals are concerned.
+We also want to start experimenting with NoSQL and graph databases, to comparatively weigh the benefits and drawbacks with SQL, as far as IndieK’s goals are concerned.
 
 ## 4. Automatic search
 
