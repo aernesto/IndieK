@@ -1,10 +1,8 @@
-![Itemsgraph](/images/my_first_topic.png)
-
-Welcome to IndieK's documentation website!
+*Welcome to IndieK's documentation website!*
 
 _Current version of IndieK is 0.1.0_
 
-As you may know, IndieK is still an _embryo_! This why we need your feedback! 
+As you may know, IndieK is still an _embryo_! This is why we need your feedback! 
 
 For general information about this application, check out:
 - the [GitHub repo](https://github.com/aernesto/IndieK)
@@ -41,3 +39,6 @@ Command list
     - [setindiekdb](/setindiekdb.md)
     
 [Roadmap](/roadmap.md)
+
+The following image is a snapshot of what graphs IndieK currently allows you to visualize.
+![Itemsgraph](/images/my_first_topic.png)
