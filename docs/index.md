@@ -40,5 +40,5 @@ Command list
     
 [Roadmap](/roadmap.md)
 
-The following image is a snapshot of what graphs IndieK currently allows you to visualize.
+The following is an example graph produced with IndieK.
 ![Itemsgraph](/images/my_first_topic.png)
