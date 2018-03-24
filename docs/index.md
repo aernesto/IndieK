@@ -1,4 +1,4 @@
-*Welcome to IndieK's documentation website!*
+**Welcome to IndieK's documentation website!**
 
 _Current version of IndieK is 0.1.0_
 
