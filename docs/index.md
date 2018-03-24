@@ -13,7 +13,7 @@ Any question or remark about this documentation, or about IndieK? Apply to join 
 
 If you want to contribute to IndieK, see our [Contribute](https://github.com/aernesto/IndieK/blob/master/README.md#contribute) section.
 
-# Documentation table of contents
+# Contents
 
 [Installation](/installation.md)  
 Command list  
