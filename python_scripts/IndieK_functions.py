@@ -1,6 +1,7 @@
 # requires the following imports
 from pyArango.connection import *
 from pyArango.document import Document
+# from pyArango.collection import Collection
 import uuid
 # connection = Connection(username="root", password="l,.7)OCR")
 # sys.path.extend(['/home/radillo/programming/Python/PyArangoTests'])
@@ -9,6 +10,8 @@ import uuid
 
 class Workspace:
     """Main user interface. Items, topics and graphs are loaded from and saved the db from this class"""
+    # todo: check method add_item()
+    # todo: consider making all the methods private with prefix _
     def __init__(self, connection, items_dict=None, topics_dict=None, graphs_dict=None, dbname="test", interactive=True):
         self.conn = connection
         # opens DB test
@@ -55,9 +58,30 @@ class Workspace:
             workspace_item_id = str(uuid.uuid4())[0:6]
         return workspace_item_id
 
-    def create_new_item(self, item_content=None):
+    def fetch_item(self, key, rawResults=False, rev=None):
         """
-        creates new item and saves it to db.
+        function based on pyArango.collection.Collection.fetchDocument()
+        fetches item from db and tries to insert it into workspace.
+        returns string to stdout if item already in workspace
+        """
+        # todo: figure out what to do if item is already loaded in workspace
+        url = "%s/%s/%s" % (self.items_collection.documentsURL, self.items_collection.name, key)
+        if rev is not None:
+            r = self.items_collection.connection.session.get(url, params={'rev': rev})
+        else:
+            r = self.items_collection.connection.session.get(url)
+        if (r.status_code - 400) < 0:
+            if rawResults:
+                return r.json()
+            wid = self.generate_item_id()
+            item = Item(wid, self.items_collection, r.json())
+            self.add_item(item)
+        else:
+            raise KeyError("Unable to find document with _key: %s" % key, r.json())
+
+    def create_new_item(self, item_content=None, save_to_db=False):
+        """
+        Creates new item and saves it to db if save_to_db=True.
         :return: save to db + stdout
         """
         # todo: add automatic timestamp fields for creation and last modification dates
@@ -82,6 +106,42 @@ class Workspace:
         print('newly created item with workspace id: ' + new_item.wid)
         # 4. update workspace attributes
         self.items[wid] = new_item
+        # 5. save to db if requested
+        if save_to_db:
+            self.items[wid].save_item_to_db()
+
+    def is_in_workspace(self, obj):
+        """
+        checks whether object obj is already in workspace
+        :param obj: either an Item, or a Topic, or a Graph
+        :return: True or False
+        """
+        # create list of object _id's in workspace
+        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
+        return obj["_id"] in all_obj_ids
+
+    def add_item(self, item):
+        """
+        adds an existing Item object to the self.items dict
+        :param item: an Item object
+        :return:
+        """
+        # check that item is not already in workspace
+        # todo: think whether we might want to duplicate items within workspace
+        if self.is_in_workspace(item):
+            print('Warning: item with _key ' + item['_key'] + ' already in workspace')
+        else:
+            # check wid is not already used
+            if item.wid in self.items.keys():
+                item.wid = self.generate_item_id()
+            # add item to workspace
+            self.items[item.wid] = item
+
+    def diagnostic(self):
+        # todo: show for each object whether it is saved to db or not (or maybe changed since fetched)
+        self.summary()
+        self.list_items(content=True)
 
 
 class Item(Document):
@@ -89,6 +149,7 @@ class Item(Document):
     item object in IndieK's BLL
     """
     def __init__(self, wid, collection, jsonFieldInit={}):
+        # todo: is the empty dict default argument best practice here?
         # todo: I don't know if this use of super() is best practice
         super().__init__(collection, jsonFieldInit)
         self.wid = wid
@@ -102,25 +163,38 @@ class Item(Document):
         print("content:\n%s\n%s" % (content_separator, self['content']))
         print(content_separator)
 
-    def delete_item_db(self):
+    def delete_item_from_db(self):
         """
         removes item specified by arguments from ArangoDB
         :return: delete from db + stdout
         """
-        item_key = self['_key']
+        key = self['_key']
         self.delete()
-        print('item ' + item_key + ' has been deleted from db %s' % self.collection.database)
+        print('item ' + key + ' has been deleted from db %s' % self.collection.database)
 
     def save_item_to_db(self):
-        # todo: check that with such static method, the item's _key from the workspace gets updated
+        """save item to db"""
         self.save()
         print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
 
-    def edit_item(self, item_content, save=False):
+    def edit_item(self, item_content=None, save=False, interactive=True):
         # todo: run some validation on item_content
-        self['content'] = item_content
+        # todo: think of an interactive way of editing existing content
+        if interactive:
+            print('Enter new content for item: ')
+            sentinel = ''  # ends when the empty string is seen
+            item_content = '\n'.join(iter(input, sentinel))
+        if item_content is not None:
+            self['content'] = item_content
+        else:
+            print('no content was provided, item left unchanged')
         if save:
             self.save_item_to_db()
+
+
+"""
+The following are functions to consult the database. Not clear yet how to include them into a class.
+"""
 
 
 def search_and_item_string(db, *args):
@@ -179,13 +253,16 @@ if __name__ == "__main__":
     w1 = Workspace(conn, interactive=False)
 
     # create new item
-    new_item_content = 'hello\nyou world'
-    w1.create_new_item(new_item_content)
+    # new_item_content = 'hello\nyou world'
+    # w1.create_new_item(new_item_content)
 
-    # checks
-    w1.list_items(content=True)
+    # fetch existing item from db
+    item_key = '174480'
+    w1.fetch_item(item_key)
 
     # save item to db
     item_id = list(w1.items.keys())[0]
     w1.items[item_id].save_item_to_db()
     w1.list_items(content=True)
+    w1.diagnostic()
+    # create new topic
