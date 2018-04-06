@@ -155,6 +155,36 @@ class Workspace:
         self.summary()
         self.list_items(content=True)
 
+    def display_item_info(self, item_wid):
+        """displays on stdout item's main info"""
+        if item_wid in self.items.keys():
+            if self.items[item_wid]["_id"] is None:
+                print("_id: None      (item not saved to db)")
+                print("_key: %s" % self.items[item_wid]["_key"])
+            else:
+                print("_id: %s" % self.items[item_wid]["_id"])
+                print("_key: %s" % self.items[item_wid]["_key"])
+            print("wid: %s" % self.items[item_wid].wid)
+        else:
+            print('item not in workspace. Nothing done')
+
+    """ Methods below are all based on methods with same name in Item class"""
+    # todo: check whether this is a good class architecture
+
+    def save_item_to_db(self, item_wid):
+        """saves item from workspace to db using method from Item class"""
+        if item_wid in self.items.keys():
+            self.items[item_wid].save_item_to_db()
+        else:
+            print('item not in workspace. Nothing done')
+
+    def display_item_content(self, item_wid):
+        """displays to stdout item content from workspace using method from Item class"""
+        if item_wid in self.items.keys():
+            self.items[item_wid].display_item_content()
+        else:
+            print('item not in workspace. Nothing done')
+
 
 class Item(Document):
     """
@@ -179,13 +209,28 @@ class Item(Document):
         """
         removes item specified by arguments from ArangoDB
         :return: delete from db + stdout
+
+        WARNING: if item was obtained from a workspace with the equality operator,
+        i.e. if item is obtained via the command: item=Workspace.items[wid]
+        then this method directly affects the item from the workspace.
         """
+        # todo: Is the warning above a problem or a desired feature? See if self.saveCopy() is useful
         key = self['_key']
         self.delete()
         print('item ' + key + ' has been deleted from db %s' % self.collection.database)
 
     def save_item_to_db(self):
-        """save item to db"""
+        """
+        save item to db
+
+        WARNING: if item was obtained from a workspace with the equality operator,
+        i.e. if item is obtained via the command: item=Workspace.items[wid]
+        then this method directly affects the item from the workspace.
+
+        BUG: item content gets saved to db only if item orgininally has no content.
+        When it does, new content doesn't get saved and old content remains in db
+        """
+        # todo: resolve bug above. See file save_item_bug_reprod.txt for reproduction of bug
         self.save()
         print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
 
@@ -260,6 +305,13 @@ def list_topics(collection):
 
 
 if __name__ == "__main__":
+    # to run this script in interactive mode from Python's console,
+    # type the following at the start of the console session
+    # from IndieK_functions import *
+    # then create the connection below and the Workspace with the interactive=True option
+    # from there, you are good to play with the methods
+
+    # everything from here onwards is for batch mode
     conn = Connection(username="root", password="l,.7)OCR")
     # create workspace
     w1 = Workspace(conn, interactive=False)
