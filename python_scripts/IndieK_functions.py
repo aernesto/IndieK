@@ -185,6 +185,15 @@ class Workspace:
         else:
             print('item not in workspace. Nothing done')
 
+    def edit_item(self, item_wid, item_content=None, save_to_db=False, interactive=True):
+        # todo: test this method
+        # todo: produce a warning or maybe abort if item_content is not None and interactive=True
+        """ 'imported' method from Item class"""
+        if item_wid in self.items.keys():
+            self.items[item_wid].edit_item(item_content, save_to_db, interactive)
+        else:
+            print('item not in workspace. Nothing done')
+
 
 class Item(Document):
     """
@@ -229,10 +238,15 @@ class Item(Document):
 
         BUG: item content gets saved to db only if item orgininally has no content.
         When it does, new content doesn't get saved and old content remains in db
+        Potential fix is to replace save() by patch()
         """
         # todo: resolve bug above. See file save_item_bug_reprod.txt for reproduction of bug
-        self.save()
-        print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
+        if self["_id"] is None:
+            self.save()
+            print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
+        else:
+            self.patch()
+            print('new item content was saved to db')
 
     def edit_item(self, item_content=None, save_to_db=False, interactive=True):
         # todo: run some validation on item_content
