@@ -101,11 +101,14 @@ class Workspace:
 
         # 2. generate workspace id
         wid = self.generate_item_id()
+
         # 3. create item according to collection's method
         new_item = Item(wid, self.items_collection, {"content": new_item_string})
         print('newly created item with workspace id: ' + new_item.wid)
-        # 4. update workspace attributes
+
+        # 4. update workspace
         self.items[wid] = new_item
+
         # 5. save to db if requested
         if save_to_db:
             self.items[wid].save_item_to_db()
@@ -137,6 +140,15 @@ class Workspace:
                 item.wid = self.generate_item_id()
             # add item to workspace
             self.items[item.wid] = item
+
+    def remove_item(self, item_wid, delete_from_db=False):
+        """remove item from workspace, and deletes it from db if requested"""
+        if item_wid in self.items.keys():
+            if delete_from_db:
+                self.items[item_wid].delete_item_from_db()
+            del self.items[item_wid]
+        else:
+            print('item not in workspace. Nothing done')
 
     def diagnostic(self):
         # todo: show for each object whether it is saved to db or not (or maybe changed since fetched)
@@ -177,7 +189,7 @@ class Item(Document):
         self.save()
         print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
 
-    def edit_item(self, item_content=None, save=False, interactive=True):
+    def edit_item(self, item_content=None, save_to_db=False, interactive=True):
         # todo: run some validation on item_content
         # todo: think of an interactive way of editing existing content
         if interactive:
@@ -188,7 +200,7 @@ class Item(Document):
             self['content'] = item_content
         else:
             print('no content was provided, item left unchanged')
-        if save:
+        if save_to_db:
             self.save_item_to_db()
 
 
