@@ -313,6 +313,7 @@ class Item(Document):
         # todo: is the empty dict default argument best practice here?
         # todo: I don't know if this use of super() is best practice
         super().__init__(collection, jsonFieldInit)
+        # todo: think whether attr wid is good given that it might be used outside of worksp (e.g. DbExploration?)
         self.wid = wid
         self.as_in_db = False
         self.type = 'items'  # todo: check whether it makes more sense to overwrite the typeName attribute
@@ -440,7 +441,7 @@ class Topic(Document):
             print('new topic fields were saved to db')
 
 
-class DbExploration:
+class DbExplore:
     """
     This class should strictly be used to consult the database. Never to write to it.
     """
@@ -461,8 +462,14 @@ class DbExploration:
 
         :param content: if True, displays item content on stdout
         """
-        for item in self.items_collection:
-            item.display_item_info(display_content=content)
+        line_sep = '\n==============================\n'
+        for item in self.items_collection.fetchAll():
+            print("_id: %s" % item['_id'])
+            print("_key: %s" % item["_key"])
+            print("_rev: %s" % item["_rev"])
+            if content:
+                print('content: %s' % item['content'])
+            print(line_sep)
 
     def search_and_item_string(self, *args):
         """
@@ -492,23 +499,26 @@ class DbExploration:
         for item in query_result:
             item.display_item_info(display_content=True)
 
-    def list_topics(self):
+    def list_all_topics(self):
         """
         list topic names and descriptions that are stored in db
         :return: stdout
         """
+        line_sep = '\n==============================\n'
         for topic in self.topics_collection.fetchAll():
             print(topic['name'])
             print(topic['description'])
-            print('----------')
+            print(line_sep)
 
 
 if __name__ == "__main__":
     # to run this script in interactive mode from Python's console,
     # type the following at the start of the console session
     # from IndieK_functions import *
-    # then create the connection below and the Workspace with the interactive=True option
-    # from there, you are good to play with the methods
+    # conn = Connection(username="root", password="l,.7)OCR")
+    # w = Workspace(conn)
+    # db = DbExplore(conn)
+    # from there, you are good to play with the methods of w and db
 
     # everything from here onwards is for batch mode
     conn = Connection(username="root", password="l,.7)OCR")
