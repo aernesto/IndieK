@@ -73,6 +73,22 @@ class Workspace:
             workspace_id = str(uuid.uuid4())[0:6]
         return workspace_id
 
+    def remove_object(self, obj_wid, delete_from_db=False):
+        """
+        remove object from workspace, and deletes it from db if requested
+
+        WARNING: This method heavily uses the following two facts:
+        1. all objects from Workspace should have a method delete_from_db()
+        2. equality operator for such objects is identity (not copy)
+        """
+        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        if obj_wid in all_obj_dict.keys():
+            if delete_from_db:
+                all_obj_dict[obj_wid].delete_from_db()
+            del all_obj_dict[obj_wid]
+        else:
+            print('item not in workspace. Nothing done')
+
     """METHODS RELATED TO ITEMS MANIPULATION"""
 
     def fetch_item(self, key, rawResults=False, rev=None):
@@ -149,15 +165,6 @@ class Workspace:
                 item.wid = self.generate_workspace_id()
             # add item to workspace
             self.items[item.wid] = item
-
-    def remove_item(self, item_wid, delete_from_db=False):
-        """remove item from workspace, and deletes it from db if requested"""
-        if item_wid in self.items.keys():
-            if delete_from_db:
-                self.items[item_wid].delete_item_from_db()
-            del self.items[item_wid]
-        else:
-            print('item not in workspace. Nothing done')
 
     """ Methods below are all based on methods with same name in Item class"""
     # todo: check whether this is a good class architecture
@@ -261,7 +268,7 @@ class Item(Document):
                                           self['content'],
                                           content_separator))
 
-    def delete_item_from_db(self):
+    def delete_from_db(self):
         """
         removes item specified by arguments from ArangoDB
         :return: delete from db + stdout
@@ -338,7 +345,7 @@ class Topic(Document):
     #     """
     #     return list_of_items
 
-    def delete_topic_from_db(self):
+    def delete_from_db(self):
         """
         removes topic specified by arguments from ArangoDB
         :return: delete from db + stdout
