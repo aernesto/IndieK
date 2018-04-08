@@ -50,8 +50,7 @@ class Workspace:
     def list_items(self, content=False):
         print('List of workspace items')
         for item in self.objects['items'].values():
-            # for debugging
-            print('following type should be IndieK_functions.Item', type(item))
+            # todo: find out why PyCharm produces a warning at the next line
             item.display_info(display_content=content)
 
     def diagnostic(self):
@@ -109,7 +108,7 @@ class Workspace:
             item.display_info()
             self.add_item(item)
         else:
-            raise KeyError("Unable to find document with _key: %s" % key, r.json())
+            raise KeyError("Unable to find item with _key: %s" % key, r.json())
 
     def create_new_item(self, item_content=None, save_to_db=False):
         """
@@ -147,7 +146,7 @@ class Workspace:
 
     def add_item(self, item):
         """
-        adds an existing Item object to the self.items dict
+        adds an existing Item object to the self.objects['items'] dict
         :param item: an Item object
         :return:
         """
@@ -195,6 +194,48 @@ class Workspace:
             print('item not in workspace. Nothing done')
 
     """METHODS RELATED TO TOPICS MANIPULATION"""
+
+    def add_topic(self, topic):
+        """
+        adds an existing Topic object to the self.objects['topics'] dict
+        :param topic: a topic object
+        :return:
+        """
+        # check that topic is not already in workspace
+        # todo: try to merge this method with the add_item method...
+        # todo: think whether we might want to duplicate topics within workspace
+        if self.is_in_workspace(topic):
+            print('Warning: topic with _key ' + topic['_key'] + ' already in workspace')
+        else:
+            # check wid is not already used
+            if topic.wid in self.objects['items'].keys():
+                topic.wid = self.generate_workspace_id()
+            # add item to workspace
+            self.objects['topics'][topic.wid] = topic
+
+    def fetch_topic(self, key, rawResults=False, rev=None):
+        """
+        function based on pyArango.collection.Collection.fetchDocument()
+        fetches topic from db and tries to insert it into workspace.
+        returns string to stdout if topic already in workspace
+        """
+        # todo: figure out what to do if topic is already loaded in workspace
+        url = "%s/%s/%s" % (self.topics_collection.documentsURL, self.topics_collection.name, key)
+        if rev is not None:
+            r = self.topics_collection.connection.session.get(url, params={'rev': rev})
+        else:
+            r = self.topics_collection.connection.session.get(url)
+        if (r.status_code - 400) < 0:
+            if rawResults:
+                return r.json()
+            wid = self.generate_workspace_id()
+            topic = Topic(wid, self.items_collection, r.json())
+            topic.as_in_db = True
+            print('item fetched:')
+            topic.display_info()
+            self.add_topic(topic)
+        else:
+            raise KeyError("Unable to find topic with _key: %s" % key, r.json())
 
     def create_new_topic(self, save_to_db=False):
         """
