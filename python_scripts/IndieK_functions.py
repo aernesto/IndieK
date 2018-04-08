@@ -11,7 +11,7 @@ import uuid
 
 class Workspace:
     """Main user interface. Items, topics and graphs are loaded from and saved to the db from this class"""
-    # todo: check method add_item()
+    # todo: check method add_item(); especially if item is taken from another workspace
     # todo: consider making all the methods private with prefix _
     def __init__(self, connection, items_dict=None, topics_dict=None, graphs_dict=None, dbname="test", interactive=True):
         self.conn = connection
@@ -152,7 +152,6 @@ class Workspace:
             print('item not in workspace. Nothing done')
 
     def diagnostic(self):
-        # todo: show for each object whether it is saved to db or not (or maybe changed since fetched)
         self.summary()
         print('')  # for new line
         self.list_items(content=True)
@@ -182,7 +181,6 @@ class Workspace:
             print('item not in workspace. Nothing done')
 
     def edit_item(self, item_wid, item_content=None, save_to_db=False, interactive=True):
-        # todo: test this method
         # todo: produce a warning or maybe abort if item_content is not None and interactive=True
         """ 'imported' method from Item class"""
         if item_wid in self.items.keys():
@@ -231,7 +229,8 @@ class Item(Document):
         i.e. if item is obtained via the command: item=Workspace.items[wid]
         then this method directly affects the item from the workspace.
         """
-        # todo: Is the warning above a problem or a desired feature? See if self.saveCopy() is useful
+        # todo: Is the warning above a problem or a desired feature?
+        # todo: check behavior when same item is in both workspaces. Do we have indep?
         key = self['_key']
         self.delete()
         self.as_in_db = False
@@ -244,12 +243,7 @@ class Item(Document):
         WARNING: if item was obtained from a workspace with the equality operator,
         i.e. if item is obtained via the command: item=Workspace.items[wid]
         then this method directly affects the item from the workspace.
-
-        BUG: item content gets saved to db only if item orgininally has no content.
-        When it does, new content doesn't get saved and old content remains in db
-        Potential fix is to replace save() by patch()
         """
-        # todo: resolve bug above. See file save_item_bug_reprod.txt for reproduction of bug
         if self["_id"] is None:
             self.save()
             self.as_in_db = True
@@ -284,7 +278,6 @@ class DbExploration:
         # opens DB test
         self.db = self.conn[dbname]  # database object from PyArango driver
         # instantiate collections
-        # todo: all these collections should be defined in IndieK's BLL
         self.items_collection = self.db["items"]
         self.topics_collection = self.db["topics"]
         self.topics_elements_relation_collection = self.db["topics_elements_relation"]
