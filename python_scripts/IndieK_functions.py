@@ -13,7 +13,8 @@ class Workspace:
     """Main user interface. Items, topics and graphs are loaded from and saved to the db from this class"""
     # todo: check method add_item(); especially if item is taken from another workspace
     # todo: consider making all the methods private with prefix _
-    def __init__(self, connection, items_dict=None, topics_dict=None, graphs_dict=None, dbname="test", interactive=True):
+    def __init__(self, connection, dbname="test", interactive=True):
+        # todo: think of how an objects dict may be passed to this method
         self.conn = connection
         # opens DB test
         self.db = self.conn[dbname]
@@ -24,25 +25,14 @@ class Workspace:
         self.topics_elements_relation_collection = self.db["topics_elements_relation"]
         self.items_relation_1_collection = self.db["items_relation_1"]
         self.subtopics_relation_collection = self.db["subtopics_relation"]
-        if items_dict is None:
-            self.items = {}
-        else:
-            self.items = items_dict
-        if topics_dict is None:
-            self.topics = {}
-        else:
-            self.topics = topics_dict
-        if graphs_dict is None:
-            self.graphs = {}
-        else:
-            self.graphs = graphs_dict
+        self.objects = {'items': {}, 'topics': {}, 'graphs': {}}
         self.interactive = interactive
 
     def summary(self):
         print('workspace contains:')
-        print('%i graphs' % len(self.graphs))
-        print('%i topics' % len(self.topics))
-        print('%i items' % len(self.items))
+        print('%i graphs' % len(self.objects['graphs']))
+        print('%i topics' % len(self.objects['topics']))
+        print('%i items' % len(self.objects['items']))
 
     def is_in_workspace(self, obj):
         """
@@ -51,14 +41,18 @@ class Workspace:
         :return: True or False
         """
         # create list of object _id's in workspace
-        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        # todo: check whether following line is best practice
+        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
+                        **self.objects['graphs']}
         all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
         return obj["_id"] in all_obj_ids
 
     def list_items(self, content=False):
         print('List of workspace items')
-        for item in self.items.values():
-            item.display_item_info(display_content=content)
+        for item in self.objects['items'].values():
+            # for debugging
+            print('following type should be IndieK_functions.Item', type(item))
+            item.display_info(display_content=content)
 
     def diagnostic(self):
         self.summary()
@@ -68,7 +62,8 @@ class Workspace:
     def generate_workspace_id(self):
         """generates a new unique workspace id"""
         workspace_id = str(uuid.uuid4())[0:6]
-        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
+                        **self.objects['graphs']}
         while workspace_id in all_obj_dict.keys():
             workspace_id = str(uuid.uuid4())[0:6]
         return workspace_id
@@ -81,7 +76,8 @@ class Workspace:
         1. all objects from Workspace should have a method delete_from_db()
         2. equality operator for such objects is identity (not copy)
         """
-        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
+                        **self.objects['graphs']}
         if obj_wid in all_obj_dict.keys():
             if delete_from_db:
                 all_obj_dict[obj_wid].delete_from_db()
@@ -110,7 +106,7 @@ class Workspace:
             item = Item(wid, self.items_collection, r.json())
             item.as_in_db = True
             print('item fetched:')
-            item.display_item_info()
+            item.display_info()
             self.add_item(item)
         else:
             raise KeyError("Unable to find document with _key: %s" % key, r.json())
@@ -143,11 +139,11 @@ class Workspace:
         print('newly created item with workspace id: ' + new_item.wid)
 
         # 4. update workspace
-        self.items[wid] = new_item
+        self.objects['items'][wid] = new_item
 
         # 5. save to db if requested
         if save_to_db:
-            self.items[wid].save_item_to_db()
+            self.objects['items'][wid].save_to_db()
 
     def add_item(self, item):
         """
@@ -161,40 +157,40 @@ class Workspace:
             print('Warning: item with _key ' + item['_key'] + ' already in workspace')
         else:
             # check wid is not already used
-            if item.wid in self.items.keys():
+            if item.wid in self.objects['items'].keys():
                 item.wid = self.generate_workspace_id()
             # add item to workspace
-            self.items[item.wid] = item
+            self.objects['items'][item.wid] = item
 
     """ Methods below are all based on methods with same name in Item class"""
     # todo: check whether this is a good class architecture
 
     def display_item_info(self, item_wid, display_content=False):
         """displays on stdout item's main info"""
-        if item_wid in self.items.keys():
-            self.items[item_wid].display_item_info(display_content=display_content)
+        if item_wid in self.objects['items'].keys():
+            self.objects['items'][item_wid].display_info(display_content=display_content)
         else:
             print('item not in workspace. Nothing done')
 
     def save_item_to_db(self, item_wid):
         """saves item from workspace to db using method from Item class"""
-        if item_wid in self.items.keys():
-            self.items[item_wid].save_item_to_db()
+        if item_wid in self.objects['items'].keys():
+            self.objects['items'][item_wid].save_to_db()
         else:
             print('item not in workspace. Nothing done')
 
     def display_item_content(self, item_wid):
         """displays to stdout item content from workspace using method from Item class"""
-        if item_wid in self.items.keys():
-            self.items[item_wid].display_item_content()
+        if item_wid in self.objects['items'].keys():
+            self.objects['items'][item_wid].display_item_content()
         else:
             print('item not in workspace. Nothing done')
 
     def edit_item(self, item_wid, item_content=None, save_to_db=False, interactive=True):
         # todo: produce a warning or maybe abort if item_content is not None and interactive=True
         """ 'imported' method from Item class"""
-        if item_wid in self.items.keys():
-            self.items[item_wid].edit_item(item_content, save_to_db, interactive)
+        if item_wid in self.objects['items'].keys():
+            self.objects['items'][item_wid].edit_item(item_content, save_to_db, interactive)
         else:
             print('item not in workspace. Nothing done')
 
@@ -230,11 +226,11 @@ class Workspace:
         print('newly created topic with workspace id: ' + new_topic.wid)
 
         # 4. update workspace
-        self.topics[wid] = new_topic
+        self.objects['topics'][wid] = new_topic
 
         # 5. save to db if requested
         if save_to_db:
-            self.topics[wid].save_topic_to_db()
+            self.objects['topics'][wid].save_to_db()
 
 
 class Item(Document):
@@ -248,7 +244,7 @@ class Item(Document):
         self.wid = wid
         self.as_in_db = False
 
-    def display_item_info(self, display_content=False):
+    def display_info(self, display_content=False):
         """displays on stdout item's main info"""
         print("_id: %s" % self['_id'])
         print("_key: %s" % self["_key"])
@@ -256,9 +252,9 @@ class Item(Document):
         print("wid: %s" % self.wid)
         print('as in db: %s' % self.as_in_db)
         if display_content:
-            self.display_item_content()
+            self.display_content()
 
-    def display_item_content(self):
+    def display_content(self):
         """
         fetches and displays content field from the item specified by the arguments
         :return: stdout
@@ -285,7 +281,7 @@ class Item(Document):
         self.as_in_db = False
         print('item ' + key + ' has been deleted from db %s' % self.collection.database)
 
-    def save_item_to_db(self):
+    def save_to_db(self):
         """
         save item to db
 
@@ -315,7 +311,7 @@ class Item(Document):
         else:
             print('no content was provided, item left unchanged')
         if save_to_db:
-            self.save_item_to_db()
+            self.save_to_db()
 
 
 class Topic(Document):
@@ -327,7 +323,7 @@ class Topic(Document):
         self.wid = wid
         self.as_in_db = False
 
-    def display_topic_info(self):
+    def display_info(self):
         """displays on stdout item's main info"""
         print("_id: %s" % self['_id'])
         print("_key: %s" % self["_key"])
@@ -356,7 +352,7 @@ class Topic(Document):
         self.as_in_db = False
         print('topic ' + key + ' has been deleted from db %s' % self.collection.database)
 
-    def save_topic_to_db(self):
+    def save_to_db(self):
         """
         save topic to db
         """
