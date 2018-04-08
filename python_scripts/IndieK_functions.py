@@ -25,14 +25,25 @@ class Workspace:
         self.topics_elements_relation_collection = self.db["topics_elements_relation"]
         self.items_relation_1_collection = self.db["items_relation_1"]
         self.subtopics_relation_collection = self.db["subtopics_relation"]
+        # NOTE: the keys for the dict objects below should match the .type attribute of the BLL objects
         self.objects = {'items': {}, 'topics': {}, 'graphs': {}}
         self.interactive = interactive
+        self.types = ('items', 'topics', 'graphs')
+
+    def create_all_obj_dict(self):
+        # todo: check whether following line is best practice
+        return {**self.objects['items'], **self.objects['topics'], **self.objects['graphs']}
 
     def summary(self):
         print('workspace contains:')
         print('%i graphs' % len(self.objects['graphs']))
         print('%i topics' % len(self.objects['topics']))
-        print('%i items' % len(self.objects['items']))
+        print('%i items' % len(self.objects['items']), end='\n\n')
+
+    def diagnostic(self):
+        self.summary()
+        self.list_topics()
+        self.list_items(content=True)
 
     def is_in_workspace(self, obj):
         """
@@ -41,28 +52,14 @@ class Workspace:
         :return: True or False
         """
         # create list of object _id's in workspace
-        # todo: check whether following line is best practice
-        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
-                        **self.objects['graphs']}
+        all_obj_dict = self.create_all_obj_dict()
         all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
         return obj["_id"] in all_obj_ids
-
-    def list_items(self, content=False):
-        print('List of workspace items')
-        for item in self.objects['items'].values():
-            # todo: find out why PyCharm produces a warning at the next line
-            item.display_info(display_content=content)
-
-    def diagnostic(self):
-        self.summary()
-        print('')  # for new line
-        self.list_items(content=True)
 
     def generate_workspace_id(self):
         """generates a new unique workspace id"""
         workspace_id = str(uuid.uuid4())[0:6]
-        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
-                        **self.objects['graphs']}
+        all_obj_dict = self.create_all_obj_dict()
         while workspace_id in all_obj_dict.keys():
             workspace_id = str(uuid.uuid4())[0:6]
         return workspace_id
@@ -75,8 +72,7 @@ class Workspace:
         1. all objects from Workspace should have a method delete_from_db()
         2. equality operator for such objects is identity (not copy)
         """
-        all_obj_dict = {**self.objects['items'], **self.objects['topics'],
-                        **self.objects['graphs']}
+        all_obj_dict = self.create_all_obj_dict()
         if obj_wid in all_obj_dict.keys():
             if delete_from_db:
                 all_obj_dict[obj_wid].delete_from_db()
@@ -84,31 +80,85 @@ class Workspace:
         else:
             print('item not in workspace. Nothing done')
 
-    """METHODS RELATED TO ITEMS MANIPULATION"""
+    def add_object(self, obj):
+        """
+        adds an existing object to the self.objects[object.type] dict
+        :param obj: an object from IndieK's BLL
+        :return: changes the self.objects dict + stdout
+        """
+        # check that object is not already in workspace
+        # todo: think whether we might want to duplicate items within workspace
+        if self.is_in_workspace(obj):
+            print('WARNING: object with _id ' + obj['_id'] + ' already in workspace. Nothing done.')
+        else:
+            # check obj.type is acceptable
+            try:
+                if obj.type in self.types:
+                    # check wid is not already used
+                    if obj.wid in self.objects[obj.type].keys():
+                        obj.wid = self.generate_workspace_id()
+                    # add object to workspace
+                    self.objects[obj.type][obj.wid] = obj
+                else:
+                    raise ValueError("the provided object's type is not supported by this method")
+            except AttributeError as err:
+                print(err.args)
 
-    def fetch_item(self, key, rawResults=False, rev=None):
+    def fetch_object(self, key, obj_type, rawResults=False, rev=None):
         """
         function based on pyArango.collection.Collection.fetchDocument()
-        fetches item from db and tries to insert it into workspace.
-        returns string to stdout if item already in workspace
+        fetches object from db and tries to insert it into workspace.
+        returns string to stdout if object already in workspace
+
+        :param key: _key field from ArangoDB
+        :param obj_type: a type from the BLL
         """
-        # todo: figure out what to do if item is already loaded in workspace
-        url = "%s/%s/%s" % (self.items_collection.documentsURL, self.items_collection.name, key)
-        if rev is not None:
-            r = self.items_collection.connection.session.get(url, params={'rev': rev})
+        if obj_type == 'items':
+            collection = self.items_collection
+        elif obj_type == 'topics':
+            collection = self.topics_collection
         else:
-            r = self.items_collection.connection.session.get(url)
+            print('sorry the provided object type is not recognized by this method yet')
+            return
+
+        # todo: figure out what to do if object is already loaded in workspace
+        url = "%s/%s/%s" % (collection.documentsURL, collection.name, key)
+        if rev is not None:
+            r = collection.connection.session.get(url, params={'rev': rev})
+        else:
+            r = collection.connection.session.get(url)
         if (r.status_code - 400) < 0:
             if rawResults:
                 return r.json()
             wid = self.generate_workspace_id()
-            item = Item(wid, self.items_collection, r.json())
-            item.as_in_db = True
-            print('item fetched:')
-            item.display_info()
-            self.add_item(item)
+            if obj_type == 'items':
+                obj = Item(wid, collection, r.json())
+                obj.as_in_db = True
+                print('item fetched:')
+                obj.display_info()
+            elif obj_type == 'topics':
+                obj = Topic(wid, collection, r.json())
+                object.as_in_db = True
+                print('topic fetched')
+            self.add_object(obj)
         else:
-            raise KeyError("Unable to find item with _key: %s" % key, r.json())
+            raise KeyError("Unable to find object with _key: %s" % key, r.json())
+
+    def save_to_db(self, obj_wid):
+        """saves object from workspace to db using method from the relevant object's class"""
+        all_objects = self.create_all_obj_dict()
+        if obj_wid in all_objects.keys():
+            all_objects[obj_wid].save_to_db()
+        else:
+            print('object not in workspace. Nothing done')
+
+    """METHODS RELATED TO ITEMS MANIPULATION"""
+
+    def list_items(self, content=False):
+        print('List of workspace items:')
+        for item in self.objects['items'].values():
+            # todo: find out why PyCharm produces a warning at the next line
+            item.display_info(display_content=content)
 
     def create_new_item(self, item_content=None, save_to_db=False):
         """
@@ -144,23 +194,6 @@ class Workspace:
         if save_to_db:
             self.objects['items'][wid].save_to_db()
 
-    def add_item(self, item):
-        """
-        adds an existing Item object to the self.objects['items'] dict
-        :param item: an Item object
-        :return:
-        """
-        # check that item is not already in workspace
-        # todo: think whether we might want to duplicate items within workspace
-        if self.is_in_workspace(item):
-            print('Warning: item with _key ' + item['_key'] + ' already in workspace')
-        else:
-            # check wid is not already used
-            if item.wid in self.objects['items'].keys():
-                item.wid = self.generate_workspace_id()
-            # add item to workspace
-            self.objects['items'][item.wid] = item
-
     """ Methods below are all based on methods with same name in Item class"""
     # todo: check whether this is a good class architecture
 
@@ -168,13 +201,6 @@ class Workspace:
         """displays on stdout item's main info"""
         if item_wid in self.objects['items'].keys():
             self.objects['items'][item_wid].display_info(display_content=display_content)
-        else:
-            print('item not in workspace. Nothing done')
-
-    def save_item_to_db(self, item_wid):
-        """saves item from workspace to db using method from Item class"""
-        if item_wid in self.objects['items'].keys():
-            self.objects['items'][item_wid].save_to_db()
         else:
             print('item not in workspace. Nothing done')
 
@@ -195,23 +221,28 @@ class Workspace:
 
     """METHODS RELATED TO TOPICS MANIPULATION"""
 
-    def add_topic(self, topic):
-        """
-        adds an existing Topic object to the self.objects['topics'] dict
-        :param topic: a topic object
-        :return:
-        """
-        # check that topic is not already in workspace
-        # todo: try to merge this method with the add_item method...
-        # todo: think whether we might want to duplicate topics within workspace
-        if self.is_in_workspace(topic):
-            print('Warning: topic with _key ' + topic['_key'] + ' already in workspace')
-        else:
-            # check wid is not already used
-            if topic.wid in self.objects['items'].keys():
-                topic.wid = self.generate_workspace_id()
-            # add item to workspace
-            self.objects['topics'][topic.wid] = topic
+    def list_topics(self):
+        print('List of workspace topics:')
+        for topic in self.objects['topics'].values():
+            topic.display_info()
+
+    # def add_topic(self, topic):
+    #     """
+    #     adds an existing Topic object to the self.objects['topics'] dict
+    #     :param topic: a topic object
+    #     :return:
+    #     """
+    #     # check that topic is not already in workspace
+    #     # todo: try to merge this method with the add_item method...
+    #     # todo: think whether we might want to duplicate topics within workspace
+    #     if self.is_in_workspace(topic):
+    #         print('Warning: topic with _key ' + topic['_key'] + ' already in workspace')
+    #     else:
+    #         # check wid is not already used
+    #         if topic.wid in self.objects['items'].keys():
+    #             topic.wid = self.generate_workspace_id()
+    #         # add item to workspace
+    #         self.objects['topics'][topic.wid] = topic
 
     def fetch_topic(self, key, rawResults=False, rev=None):
         """
@@ -233,7 +264,7 @@ class Workspace:
             topic.as_in_db = True
             print('item fetched:')
             topic.display_info()
-            self.add_topic(topic)
+            self.add_object(topic)
         else:
             raise KeyError("Unable to find topic with _key: %s" % key, r.json())
 
@@ -284,6 +315,7 @@ class Item(Document):
         super().__init__(collection, jsonFieldInit)
         self.wid = wid
         self.as_in_db = False
+        self.type = 'items'  # todo: check whether it makes more sense to overwrite the typeName attribute
 
     def display_info(self, display_content=False):
         """displays on stdout item's main info"""
@@ -291,7 +323,7 @@ class Item(Document):
         print("_key: %s" % self["_key"])
         print("_rev: %s" % self["_rev"])
         print("wid: %s" % self.wid)
-        print('as in db: %s' % self.as_in_db)
+        print('as in db: %s' % self.as_in_db, end='\n\n')
         if display_content:
             self.display_content()
 
@@ -363,6 +395,7 @@ class Topic(Document):
         super().__init__(collection, jsonFieldInit)
         self.wid = wid
         self.as_in_db = False
+        self.type = 'topics'
 
     def display_info(self):
         """displays on stdout item's main info"""
@@ -372,7 +405,7 @@ class Topic(Document):
         print("wid: %s" % self.wid)
         print('as in db: %s' % self.as_in_db)
         print('topic name: %s' % self["name"])
-        print('topic descr: %s' % self['description'])
+        print('topic descr: %s' % self['description'], end='\n\n')
 
     # todo: write the method list_items_info below
     # def list_items_info(self):
