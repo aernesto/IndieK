@@ -3,13 +3,14 @@ from pyArango.connection import *
 from pyArango.document import Document
 # from pyArango.collection import Collection
 import uuid
-# connection = Connection(username="root", password="l,.7)OCR")
-# sys.path.extend(['/home/radillo/programming/Python/PyArangoTests'])
+
+# type following lines in console to use classes from this script
 # from IndieK_functions import *
+# connection = Connection(username="root", password="l,.7)OCR")
 
 
 class Workspace:
-    """Main user interface. Items, topics and graphs are loaded from and saved the db from this class"""
+    """Main user interface. Items, topics and graphs are loaded from and saved to the db from this class"""
     # todo: check method add_item()
     # todo: consider making all the methods private with prefix _
     def __init__(self, connection, items_dict=None, topics_dict=None, graphs_dict=None, dbname="test", interactive=True):
@@ -46,10 +47,7 @@ class Workspace:
     def list_items(self, content=False):
         print('List of workspace items')
         for item in self.items.values():
-            print('item _key: %s' % item["_key"])
-            print('item wid: %s' % item.wid)
-            if content:
-                item.display_item_content()
+            item.display_item_info(display_content=content)
 
     def generate_item_id(self):
         """generates a new unique workspace item id"""
@@ -75,6 +73,9 @@ class Workspace:
                 return r.json()
             wid = self.generate_item_id()
             item = Item(wid, self.items_collection, r.json())
+            item.as_in_db = True
+            print('item fetched:')
+            item.display_item_info()
             self.add_item(item)
         else:
             raise KeyError("Unable to find document with _key: %s" % key, r.json())
@@ -153,23 +154,18 @@ class Workspace:
     def diagnostic(self):
         # todo: show for each object whether it is saved to db or not (or maybe changed since fetched)
         self.summary()
+        print('')  # for new line
         self.list_items(content=True)
-
-    def display_item_info(self, item_wid):
-        """displays on stdout item's main info"""
-        if item_wid in self.items.keys():
-            if self.items[item_wid]["_id"] is None:
-                print("_id: None      (item not saved to db)")
-                print("_key: %s" % self.items[item_wid]["_key"])
-            else:
-                print("_id: %s" % self.items[item_wid]["_id"])
-                print("_key: %s" % self.items[item_wid]["_key"])
-            print("wid: %s" % self.items[item_wid].wid)
-        else:
-            print('item not in workspace. Nothing done')
 
     """ Methods below are all based on methods with same name in Item class"""
     # todo: check whether this is a good class architecture
+
+    def display_item_info(self, item_wid, display_content=False):
+        """displays on stdout item's main info"""
+        if item_wid in self.items.keys():
+            self.items[item_wid].display_item_info(display_content=display_content)
+        else:
+            print('item not in workspace. Nothing done')
 
     def save_item_to_db(self, item_wid):
         """saves item from workspace to db using method from Item class"""
@@ -204,6 +200,17 @@ class Item(Document):
         # todo: I don't know if this use of super() is best practice
         super().__init__(collection, jsonFieldInit)
         self.wid = wid
+        self.as_in_db = False
+
+    def display_item_info(self, display_content=False):
+        """displays on stdout item's main info"""
+        print("_id: %s" % self['_id'])
+        print("_key: %s" % self["_key"])
+        print("_rev: %s" % self["_rev"])
+        print("wid: %s" % self.wid)
+        print('as in db: %s' % self.as_in_db)
+        if display_content:
+            self.display_item_content()
 
     def display_item_content(self):
         """
@@ -211,8 +218,9 @@ class Item(Document):
         :return: stdout
         """
         content_separator = '-------'
-        print("content:\n%s\n%s" % (content_separator, self['content']))
-        print(content_separator)
+        print("content:\n%s\n%s\n%s\n" % (content_separator,
+                                          self['content'],
+                                          content_separator))
 
     def delete_item_from_db(self):
         """
@@ -226,6 +234,7 @@ class Item(Document):
         # todo: Is the warning above a problem or a desired feature? See if self.saveCopy() is useful
         key = self['_key']
         self.delete()
+        self.as_in_db = False
         print('item ' + key + ' has been deleted from db %s' % self.collection.database)
 
     def save_item_to_db(self):
@@ -243,9 +252,11 @@ class Item(Document):
         # todo: resolve bug above. See file save_item_bug_reprod.txt for reproduction of bug
         if self["_id"] is None:
             self.save()
+            self.as_in_db = True
             print('item with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
         else:
             self.patch()
+            self.as_in_db = True
             print('new item content was saved to db')
 
     def edit_item(self, item_content=None, save_to_db=False, interactive=True):
@@ -257,65 +268,75 @@ class Item(Document):
             item_content = '\n'.join(iter(input, sentinel))
         if item_content is not None:
             self['content'] = item_content
+            self.as_in_db = False
         else:
             print('no content was provided, item left unchanged')
         if save_to_db:
             self.save_item_to_db()
 
 
-"""
-The following are functions to consult the database. Not clear yet how to include them into a class.
-"""
-
-
-def search_and_item_string(db, *args):
+class DbExploration:
     """
-    performs a full match of all the strings (not case sensitive). Uses AND connector.
-    :param db: database object from PyArango driver
-    :param args: strings to match in content fields from items in db.
-          !NOTE! beginning and end of each string must match beginning and end of words in field
-    :return: stdout
+    This class should strictly be used to consult the database. Never to write to it.
     """
-    words = ','.join(args)
-    aql = 'FOR item IN FULLTEXT(items, "content", "' + words + '") ' \
-          'RETURN {key: item._key, content: item.content}'
-    query_result = db.AQLQuery(aql, rawResults=True, batchSize=100)
-    for item in query_result:
-        print("item: %s" % item['key'])
-        content_separator = '-------'
-        print("content:\n%s\n%s" % (content_separator, item['content']))
-        print(content_separator)
+    def __init__(self, connection, dbname="test"):
+        self.conn = connection
+        # opens DB test
+        self.db = self.conn[dbname]  # database object from PyArango driver
+        # instantiate collections
+        # todo: all these collections should be defined in IndieK's BLL
+        self.items_collection = self.db["items"]
+        self.topics_collection = self.db["topics"]
+        self.topics_elements_relation_collection = self.db["topics_elements_relation"]
+        self.items_relation_1_collection = self.db["items_relation_1"]
+        self.subtopics_relation_collection = self.db["subtopics_relation"]
 
+    def list_all_items(self, content=False):
+        """
+        lists info from all items in db
 
-def search_or_item_string(db, *args):
-    """
-    performs a full match of all the strings (not case sensitive). Uses OR connector.
-    :param db: database object from PyArango driver
-    :param args: strings to match in content fields from items in db.
-          !NOTE! beginning and end of each string must match beginning and end of words in field
-    :return: stdout
-    """
-    words = ',|'.join(args)
-    aql = 'FOR item IN FULLTEXT(items, "content", "' + words + '") ' \
-          'RETURN {key: item._key, content: item.content}'
-    query_result = db.AQLQuery(aql, rawResults=True, batchSize=100)
-    for item in query_result:
-        print("item: %s" % item['key'])
-        content_separator = '-------'
-        print("content:\n%s\n%s" % (content_separator, item['content']))
-        print(content_separator)
+        :param content: if True, displays item content on stdout
+        """
+        for item in self.items_collection:
+            item.display_item_info(display_content=content)
 
+    def search_and_item_string(self, *args):
+        """
+        performs a full match of all the strings (not case sensitive). Uses AND connector.
+        :param args: strings to match in content fields from items in db.
+              !NOTE! beginning and end of each string must match beginning and end of words in field
+        :return: stdout
+        """
+        words = ','.join(args)
+        aql = 'FOR item IN FULLTEXT(items, "content", "' + words + '") ' \
+              'RETURN {key: item._key, content: item.content}'
+        query_result = self.db.AQLQuery(aql, rawResults=True, batchSize=100)
+        for item in query_result:
+            item.display_item_info(display_content=True)
 
-def list_topics(collection):
-    """
-    list topic names and descriptions that are stored in db
-    :param collection: topics collection from db
-    :return: stdout
-    """
-    for topic in collection.fetchAll():
-        print(topic['name'])
-        print(topic['description'])
-        print('----------')
+    def search_or_item_string(self, *args):
+        """
+        performs a full match of all the strings (not case sensitive). Uses OR connector.
+        :param args: strings to match in content fields from items in db.
+              !NOTE! beginning and end of each string must match beginning and end of words in field
+        :return: stdout
+        """
+        words = ',|'.join(args)
+        aql = 'FOR item IN FULLTEXT(items, "content", "' + words + '") ' \
+              'RETURN {key: item._key, content: item.content}'
+        query_result = self.db.AQLQuery(aql, rawResults=True, batchSize=100)
+        for item in query_result:
+            item.display_item_info(display_content=True)
+
+    def list_topics(self):
+        """
+        list topic names and descriptions that are stored in db
+        :return: stdout
+        """
+        for topic in self.topics_collection.fetchAll():
+            print(topic['name'])
+            print(topic['description'])
+            print('----------')
 
 
 if __name__ == "__main__":
