@@ -30,6 +30,18 @@ class Workspace:
         self.interactive = interactive
         self.types = ('items', 'topics', 'graphs')
 
+    def get_type_from_wid(self, wid):
+        """returns the BLL type of an object from the workspace, given its wid"""
+        # todo: Can I simplify this method using self.is_in_workspace()?
+        if wid in self.objects['items'].keys():
+            return 'items'
+        elif wid in self.objects['topics'].keys():
+            return 'topics'
+        elif wid in self.objects['graphs'].keys():
+            return 'graphs'
+        else:
+            print('wid not in workspace')
+
     def create_all_obj_dict(self):
         # todo: check whether following line is best practice
         return {**self.objects['items'], **self.objects['topics'], **self.objects['graphs']}
@@ -45,16 +57,25 @@ class Workspace:
         self.list_topics()
         self.list_items(content=True)
 
-    def is_in_workspace(self, obj):
+    def is_in_workspace(self, **kwargs):
         """
         checks whether object obj is already in workspace
-        :param obj: either an Item, or a Topic, or a Graph
+        :param kwargs: if arg name is one of 'obj', '_id', 'wid'
         :return: True or False
         """
+        # todo: is this structure with **kwargs really necessary?
+        if len(kwargs) != 1:
+            print('Single keyword parameter expected')
+            return
         # create list of object _id's in workspace
         all_obj_dict = self.create_all_obj_dict()
         all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
-        return obj["_id"] in all_obj_ids
+        if 'obj' in kwargs.keys():
+            return kwargs['obj']["_id"] in all_obj_ids
+        elif '_id' in kwargs.keys():
+            return kwargs['_id'] in all_obj_ids
+        elif 'wid' in kwargs.keys():
+            return kwargs['wid'] in all_obj_dict.keys()
 
     def generate_workspace_id(self):
         """generates a new unique workspace id"""
@@ -76,7 +97,8 @@ class Workspace:
         if obj_wid in all_obj_dict.keys():
             if delete_from_db:
                 all_obj_dict[obj_wid].delete_from_db()
-            del all_obj_dict[obj_wid]
+            obj_type = self.get_type_from_wid(obj_wid)
+            del self.objects[obj_type][obj_wid]
         else:
             print('item not in workspace. Nothing done')
 
@@ -88,7 +110,7 @@ class Workspace:
         """
         # check that object is not already in workspace
         # todo: think whether we might want to duplicate items within workspace
-        if self.is_in_workspace(obj):
+        if self.is_in_workspace(obj=obj):
             print('WARNING: object with _id ' + obj['_id'] + ' already in workspace. Nothing done.')
         else:
             # check obj.type is acceptable
@@ -138,8 +160,9 @@ class Workspace:
                 obj.display_info()
             elif obj_type == 'topics':
                 obj = Topic(wid, collection, r.json())
-                object.as_in_db = True
+                obj.as_in_db = True
                 print('topic fetched')
+                obj.display_info()
             self.add_object(obj)
         else:
             raise KeyError("Unable to find object with _key: %s" % key, r.json())
@@ -226,63 +249,21 @@ class Workspace:
         for topic in self.objects['topics'].values():
             topic.display_info()
 
-    # def add_topic(self, topic):
-    #     """
-    #     adds an existing Topic object to the self.objects['topics'] dict
-    #     :param topic: a topic object
-    #     :return:
-    #     """
-    #     # check that topic is not already in workspace
-    #     # todo: try to merge this method with the add_item method...
-    #     # todo: think whether we might want to duplicate topics within workspace
-    #     if self.is_in_workspace(topic):
-    #         print('Warning: topic with _key ' + topic['_key'] + ' already in workspace')
-    #     else:
-    #         # check wid is not already used
-    #         if topic.wid in self.objects['items'].keys():
-    #             topic.wid = self.generate_workspace_id()
-    #         # add item to workspace
-    #         self.objects['topics'][topic.wid] = topic
-
-    def fetch_topic(self, key, rawResults=False, rev=None):
-        """
-        function based on pyArango.collection.Collection.fetchDocument()
-        fetches topic from db and tries to insert it into workspace.
-        returns string to stdout if topic already in workspace
-        """
-        # todo: figure out what to do if topic is already loaded in workspace
-        url = "%s/%s/%s" % (self.topics_collection.documentsURL, self.topics_collection.name, key)
-        if rev is not None:
-            r = self.topics_collection.connection.session.get(url, params={'rev': rev})
-        else:
-            r = self.topics_collection.connection.session.get(url)
-        if (r.status_code - 400) < 0:
-            if rawResults:
-                return r.json()
-            wid = self.generate_workspace_id()
-            topic = Topic(wid, self.items_collection, r.json())
-            topic.as_in_db = True
-            print('item fetched:')
-            topic.display_info()
-            self.add_object(topic)
-        else:
-            raise KeyError("Unable to find topic with _key: %s" % key, r.json())
-
     def create_new_topic(self, save_to_db=False):
         """
         Creates new topic and saves it to db if save_to_db=True.
         :return: save to db + stdout
         """
         # todo: add automatic timestamp fields for creation and last modification dates
-        # todo: think of what constraints should be enforced on topic name and description
+        # todo: think of what constraints should be enforced on topic name and description and implement checks
 
         if self.interactive:
             # 1. get topic name from user
-            print('Enter name of new topic: ')
+            print('Enter name of new topic: (30 chars max)')
             sentinel = ''  # ends when the empty string is seen
             new_topic_name = '\n'.join(iter(input, sentinel))
             # 2. get topic description from user
-            print('Enter name of new topic: ')
+            print('Enter description of new topic (1 line): ')
             sentinel = ''  # ends when the empty string is seen
             new_topic_descr = '\n'.join(iter(input, sentinel))
         else:
@@ -463,6 +444,7 @@ class DbExplore:
         :param content: if True, displays item content on stdout
         """
         line_sep = '\n==============================\n'
+        print(line_sep)
         for item in self.items_collection.fetchAll():
             print("_id: %s" % item['_id'])
             print("_key: %s" % item["_key"])
@@ -505,19 +487,25 @@ class DbExplore:
         :return: stdout
         """
         line_sep = '\n==============================\n'
-        for topic in self.topics_collection.fetchAll():
-            print(topic['name'])
-            print(topic['description'])
+        print(line_sep)
+        for doc in self.topics_collection.fetchAll():
+            print("_id: %s" % doc['_id'])
+            print("_key: %s" % doc["_key"])
+            print("_rev: %s" % doc["_rev"])
+            print(doc['name'])
+            print(doc['description'])
             print(line_sep)
 
 
 if __name__ == "__main__":
     # to run this script in interactive mode from Python's console,
     # type the following at the start of the console session
-    # from IndieK_functions import *
-    # conn = Connection(username="root", password="l,.7)OCR")
-    # w = Workspace(conn)
-    # db = DbExplore(conn)
+    #
+# from IndieK_functions import *
+# conn = Connection(username="root", password="l,.7)OCR")
+# w = Workspace(conn)
+# db = DbExplore(conn)
+    #
     # from there, you are good to play with the methods of w and db
 
     # everything from here onwards is for batch mode
