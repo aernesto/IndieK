@@ -191,6 +191,44 @@ class Workspace:
         else:
             print('item not in workspace. Nothing done')
 
+    """METHODS RELATED TO TOPICS MANIPULATION"""
+
+    def create_new_topic(self, save_to_db=False):
+        """
+        Creates new topic and saves it to db if save_to_db=True.
+        :return: save to db + stdout
+        """
+        # todo: add automatic timestamp fields for creation and last modification dates
+        # todo: think of what constraints should be enforced on topic name and description
+
+        if self.interactive:
+            # 1. get topic name from user
+            print('Enter name of new topic: ')
+            sentinel = ''  # ends when the empty string is seen
+            new_topic_name = '\n'.join(iter(input, sentinel))
+            # 2. get topic description from user
+            print('Enter name of new topic: ')
+            sentinel = ''  # ends when the empty string is seen
+            new_topic_descr = '\n'.join(iter(input, sentinel))
+        else:
+            print("this method can't be used in non-interactive mode yet")
+            return None
+
+        # 2. generate workspace id
+        wid = self.generate_workspace_id()
+
+        # 3. create topic according to collection's method
+        new_topic = Topic(wid, self.topics_collection,
+                          dict(name=new_topic_name, description=new_topic_descr))
+        print('newly created topic with workspace id: ' + new_topic.wid)
+
+        # 4. update workspace
+        self.topics[wid] = new_topic
+
+        # 5. save to db if requested
+        if save_to_db:
+            self.topics[wid].save_topic_to_db()
+
 
 class Item(Document):
     """
