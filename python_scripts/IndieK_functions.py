@@ -44,17 +44,36 @@ class Workspace:
         print('%i topics' % len(self.topics))
         print('%i items' % len(self.items))
 
+    def is_in_workspace(self, obj):
+        """
+        checks whether object obj is already in workspace
+        :param obj: either an Item, or a Topic, or a Graph
+        :return: True or False
+        """
+        # create list of object _id's in workspace
+        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
+        return obj["_id"] in all_obj_ids
+
     def list_items(self, content=False):
         print('List of workspace items')
         for item in self.items.values():
             item.display_item_info(display_content=content)
 
-    def generate_item_id(self):
-        """generates a new unique workspace item id"""
-        workspace_item_id = str(uuid.uuid4())[0:6]
-        while workspace_item_id in self.items.keys():
-            workspace_item_id = str(uuid.uuid4())[0:6]
-        return workspace_item_id
+    def diagnostic(self):
+        self.summary()
+        print('')  # for new line
+        self.list_items(content=True)
+
+    def generate_workspace_id(self):
+        """generates a new unique workspace id"""
+        workspace_id = str(uuid.uuid4())[0:6]
+        all_obj_dict = {**self.items, **self.topics, **self.graphs}
+        while workspace_id in all_obj_dict.keys():
+            workspace_id = str(uuid.uuid4())[0:6]
+        return workspace_id
+
+    """METHODS RELATED TO ITEMS MANIPULATION"""
 
     def fetch_item(self, key, rawResults=False, rev=None):
         """
@@ -71,7 +90,7 @@ class Workspace:
         if (r.status_code - 400) < 0:
             if rawResults:
                 return r.json()
-            wid = self.generate_item_id()
+            wid = self.generate_workspace_id()
             item = Item(wid, self.items_collection, r.json())
             item.as_in_db = True
             print('item fetched:')
@@ -101,7 +120,7 @@ class Workspace:
             new_item_string = item_content
 
         # 2. generate workspace id
-        wid = self.generate_item_id()
+        wid = self.generate_workspace_id()
 
         # 3. create item according to collection's method
         new_item = Item(wid, self.items_collection, {"content": new_item_string})
@@ -113,17 +132,6 @@ class Workspace:
         # 5. save to db if requested
         if save_to_db:
             self.items[wid].save_item_to_db()
-
-    def is_in_workspace(self, obj):
-        """
-        checks whether object obj is already in workspace
-        :param obj: either an Item, or a Topic, or a Graph
-        :return: True or False
-        """
-        # create list of object _id's in workspace
-        all_obj_dict = {**self.items, **self.topics, **self.graphs}
-        all_obj_ids = [o["_id"] for o in all_obj_dict.values()]
-        return obj["_id"] in all_obj_ids
 
     def add_item(self, item):
         """
@@ -138,7 +146,7 @@ class Workspace:
         else:
             # check wid is not already used
             if item.wid in self.items.keys():
-                item.wid = self.generate_item_id()
+                item.wid = self.generate_workspace_id()
             # add item to workspace
             self.items[item.wid] = item
 
@@ -150,11 +158,6 @@ class Workspace:
             del self.items[item_wid]
         else:
             print('item not in workspace. Nothing done')
-
-    def diagnostic(self):
-        self.summary()
-        print('')  # for new line
-        self.list_items(content=True)
 
     """ Methods below are all based on methods with same name in Item class"""
     # todo: check whether this is a good class architecture
@@ -231,6 +234,7 @@ class Item(Document):
         """
         # todo: Is the warning above a problem or a desired feature?
         # todo: check behavior when same item is in both workspaces. Do we have indep?
+        # todo: amend this method once relations with item nodes exist
         key = self['_key']
         self.delete()
         self.as_in_db = False
@@ -267,6 +271,58 @@ class Item(Document):
             print('no content was provided, item left unchanged')
         if save_to_db:
             self.save_item_to_db()
+
+
+class Topic(Document):
+    """
+    Topic object in IndieK's BLL
+    """
+    def __init__(self, wid, collection, jsonFieldInit={}):
+        super().__init__(collection, jsonFieldInit)
+        self.wid = wid
+        self.as_in_db = False
+
+    def display_topic_info(self):
+        """displays on stdout item's main info"""
+        print("_id: %s" % self['_id'])
+        print("_key: %s" % self["_key"])
+        print("_rev: %s" % self["_rev"])
+        print("wid: %s" % self.wid)
+        print('as in db: %s' % self.as_in_db)
+        print('topic name: %s' % self["name"])
+        print('topic descr: %s' % self['description'])
+
+    # todo: write the method list_items_info below
+    # def list_items_info(self):
+    #     """
+    #     list the info from topic's items
+    #     :return: stdout
+    #     """
+    #     return list_of_items
+
+    def delete_topic_from_db(self):
+        """
+        removes topic specified by arguments from ArangoDB
+        :return: delete from db + stdout
+        """
+        # todo: amend this method once relations with topic nodes exist
+        key = self['_key']
+        self.delete()
+        self.as_in_db = False
+        print('topic ' + key + ' has been deleted from db %s' % self.collection.database)
+
+    def save_topic_to_db(self):
+        """
+        save topic to db
+        """
+        if self["_id"] is None:
+            self.save()
+            self.as_in_db = True
+            print('topic with workspace id %s got assigned _key %s: ' % (self.wid, self["_key"]))
+        else:
+            self.patch()
+            self.as_in_db = True
+            print('new topic fields were saved to db')
 
 
 class DbExploration:
