@@ -1,7 +1,8 @@
 # requires the following imports
 from pyArango.connection import *
 from pyArango.document import Document
-# from pyArango.collection import Collection
+from pyArango.collection import Collection, Field
+from pyArango.graph import Graph, EdgeDefinition
 import uuid
 
 # type following lines in console to use classes from this script
@@ -436,6 +437,7 @@ class DbExplore:
         self.topics_elements_relation_collection = self.db["topics_elements_relation"]
         self.items_relation_1_collection = self.db["items_relation_1"]
         self.subtopics_relation_collection = self.db["subtopics_relation"]
+        self.graph_topics_elements = self.db.graphs["topics_elements"]
 
     def list_all_items(self, content=False):
         """
@@ -511,19 +513,51 @@ if __name__ == "__main__":
     # everything from here onwards is for batch mode
     conn = Connection(username="root", password="l,.7)OCR")
     # create workspace
-    w1 = Workspace(conn, interactive=False)
-
-    # create new item
-    # new_item_content = 'hello\nyou world'
-    # w1.create_new_item(new_item_content)
-
-    # fetch existing item from db
-    item_key = '174480'
-    w1.fetch_item(item_key)
-
-    # save item to db
-    item_id = list(w1.items.keys())[0]
-    w1.items[item_id].save_item_to_db()
-    w1.list_items(content=True)
-    w1.diagnostic()
+    # w1 = Workspace(conn, interactive=False)
+    #
+    # # create new item
+    # # new_item_content = 'hello\nyou world'
+    # # w1.create_new_item(new_item_content)
+    #
+    # # fetch existing item from db
+    # item_key = '174480'
+    # w1.fetch_item(item_key)
+    #
+    # # save item to db
+    # item_id = list(w1.items.keys())[0]
+    # w1.items[item_id].save_item_to_db()
+    # w1.list_items(content=True)
+    # w1.diagnostic()
     # create new topic
+
+    db = DbExplore(conn)
+
+'''
+Console example for success for edge creation (item in topic)
+from IndieK_functions import *
+conn = Connection(username="root", password="l,.7)OCR")
+w = Workspace(conn)
+db = DbExplore(conn)
+w.fetch_object('438192','items')
+    item fetched:
+    _id: items/438192
+    _key: 438192
+    _rev: _WoRa1sK--_
+    wid: 596325
+    as in db: True
+w.fetch_object('471606','topics')
+    topic fetched
+    _id: topics/471606
+    _key: 471606
+    _rev: _WoV9L2y--_
+    wid: 92075a
+    as in db: True
+    topic name: et le marathon
+    topic descr: et pour une fois que je gagne!
+obj1 = w.objects['items']['596325']
+obj2 = w.objects['topics']['92075a']
+db.graph_topics_elements.link('topics_elements_relation', obj2, obj1, {})
+    ArangoEdge '_id: topics_elements_relation/915654, _key: 915654, _rev: _WvEkrtG--_, _to: items/438192, _from: topics/471606': <store: {}>
+
+PB: allows duplicate edges
+'''
