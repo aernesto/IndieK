@@ -9,6 +9,17 @@ import uuid
 # from IndieK_functions import *
 # connection = Connection(username="root", password="l,.7)OCR")
 
+"""
+GENERAL NOTES ABOUT THE WORKSPACE CLASS
+A Workspace instance contains its objects into its self.objects dict.
+As of now, this dict has only three keys: 'items', 'topics' and 'graphs'.
+To access an Item object from the workspace, use self.objects['items'][<wid>] 
+where wid is a String (wid stands for Workspace ID).
+All the wid's must be distinct, even across object types. 
+That is, if an Item and a Topic are both contained in self.objects, then they 
+cannot have same wid.
+"""
+
 
 class Workspace:
     """Main user interface. Items, topics and graphs are loaded from and saved to the db from this class"""
@@ -17,15 +28,23 @@ class Workspace:
     def __init__(self, connection, dbname="test", interactive=True):
         # todo: think of how an objects dict may be passed to this method
         self.conn = connection
-        # opens DB test
+        # opens DB
         self.db = self.conn[dbname]
+
         # instantiate collections
-        # todo: all these collections should be defined in IndieK's BLL
+        # todo: all these collections should be defined (have their own class) in IndieK's BLL
         self.items_collection = self.db["items"]
         self.topics_collection = self.db["topics"]
-        self.topics_elements_relation_collection = self.db["topics_elements_relation"]
-        self.items_relation_1_collection = self.db["items_relation_1"]
-        self.subtopics_relation_collection = self.db["subtopics_relation"]
+        # Collections for relations
+        # self.topics_elements_relation_collection = self.db["topics_elements_relation"]
+        # self.items_relation_1_collection = self.db["items_relation_1"]
+        # self.subtopics_relation_collection = self.db["subtopics_relation"]
+
+        # instantiate graphs
+        self.graph_topics_elements = self.db.graphs["topics_elements"]
+        self.graph_items_1 = self.db.graphs['items_graph']  # edges = items_relation_1
+        self.graph_topics_1 = self.db.graphs['topics_graph']  # edges = subtopics_relation
+
         # NOTE: the keys for the dict objects below should match the .type attribute of the BLL objects
         self.objects = {'items': {}, 'topics': {}, 'graphs': {}}
         self.interactive = interactive
@@ -60,8 +79,8 @@ class Workspace:
 
     def is_in_workspace(self, **kwargs):
         """
-        checks whether object obj is already in workspace
-        :param kwargs: if arg name is one of 'obj', '_id', 'wid'
+        checks whether object obj is already in workspace using either object, _id or wid
+        :param kwargs: arg name must be one of 'obj', '_id', 'wid'
         :return: True or False
         """
         # todo: is this structure with **kwargs really necessary?
@@ -79,7 +98,7 @@ class Workspace:
             return kwargs['wid'] in all_obj_dict.keys()
 
     def generate_workspace_id(self):
-        """generates a new unique workspace id"""
+        """generates a new unique workspace id (wid)"""
         workspace_id = str(uuid.uuid4())[0:6]
         all_obj_dict = self.create_all_obj_dict()
         while workspace_id in all_obj_dict.keys():
@@ -133,6 +152,8 @@ class Workspace:
         fetches object from db and tries to insert it into workspace.
         returns string to stdout if object already in workspace
 
+        NOTE: this method currently only instantiates objects of type Item or Topic
+
         :param key: _key field from ArangoDB
         :param obj_type: a type from the BLL
         """
@@ -144,7 +165,7 @@ class Workspace:
             print('sorry the provided object type is not recognized by this method yet')
             return
 
-        # todo: figure out what to do if object is already loaded in workspace
+        # todo: figure out what we want to do if object is already loaded in workspace (duplicate it + warning?)
         url = "%s/%s/%s" % (collection.documentsURL, collection.name, key)
         if rev is not None:
             r = collection.connection.session.get(url, params={'rev': rev})
@@ -286,6 +307,31 @@ class Workspace:
         if save_to_db:
             self.objects['topics'][wid].save_to_db()
 
+    """METHODS RELATED TO LINK MANIPULATION"""
+
+    def link_items(self, wid_from, wid_to, save_to_db=False):
+        """
+        Creates a link between two items in the workspace
+        :param wid_from: wid of the source item
+        :param wid_to: wid of the target item
+        :param save_to_db: saves link to db if True
+        :return:
+        """
+        # check that both objects are items
+        if self.get_type_from_wid(wid_from) != 'items' or self.get_type_from_wid(wid_to) != 'items':
+            print('At least one of the wid provided is not an Item')
+            return
+        parent = self.objects['items'][wid_from]
+        child = self.objects['items'][wid_to]
+        # test whether link already exists
+        if link_exists:
+            print('link already exists')
+        else:
+            if save_to_db:
+                self.graph_items_1.link('items_relation_1', parent, child, {})
+            # parent.children += [wid_to]
+            # child.parents += [wid_from]
+
 
 class Item(Document):
     """
@@ -299,6 +345,11 @@ class Item(Document):
         self.wid = wid
         self.as_in_db = False
         self.type = 'items'  # todo: check whether it makes more sense to overwrite the typeName attribute
+        # lists of _id's and wid's
+        # todo: figure out how to initialize the lists below?
+        self.parents = []
+        self.children = []
+        self.topics = []
 
     def display_info(self, display_content=False):
         """displays on stdout item's main info"""
