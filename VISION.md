@@ -73,7 +73,7 @@ Thus, circling items triggers the question of assigning the inside
 (or outside) items to an existing or new topic.
 
 Similarly, drawing a line triggers the question of creating an undirected link between 
-to topics, or between two items. And an arrow triggers the same question 
+two topics, or between two items. And an arrow triggers the same question 
 for a directed link.
 
 Links can be labeled and grouped. Their appearance can be changed, 
