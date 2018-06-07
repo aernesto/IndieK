@@ -61,6 +61,7 @@ class Workspace:
             return 'graphs'
         else:
             print('wid not in workspace')
+            return None
 
     def create_all_obj_dict(self):
         # todo: check whether following line is best practice
@@ -317,6 +318,7 @@ class Workspace:
         :param save_to_db: saves link to db if True
         :return:
         """
+        # what happens if wid's provided don't correspond to objects in WS?
         # check that both objects are items
         if self.get_type_from_wid(wid_from) != 'items' or self.get_type_from_wid(wid_to) != 'items':
             print('At least one of the wid provided is not an Item')
