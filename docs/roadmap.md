@@ -10,16 +10,13 @@ If you wish to read about my global vision for IndieK, check out the [VISION.md]
 
 # Development
 
-Core developers as of today are Adrian Radillo and Ernesto Radillo (yes, the latter is the father of the former).
+I am the only core developer at the moment.
 
 **Disclaimer:** Because IndieK is a FOSS, we greatly encourage public debate and discussions about IndieK’s development and design questions. However, as head developer of the project, I (the author of this document) make all the final decisions about the IndieK’s official directions of development. Of course, I shall always justify my decisions publicly, as best as I can.
 
 # Needed collaborators
 
-We need developers with knowledge in one of the following fields. If you are one of them and like IndieK’s vision, please fork our repo and start coding, following our guidelines. You may start a pull request at any time to ask questions or submit your work for review.
-
-- Python GUI specialist (especially for freehand drawings)
-- Computer vision / OCR Python specialist  
+If you are a developer and would like to get involved with IndieK, please get in touch!
 
 # Current architecture of IndieK
 ![Arch](/images/IndieK_arch_0.1.0.png)
