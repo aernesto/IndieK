@@ -9,20 +9,20 @@ import uuid
 # from IndieK_functions import *
 # connection = Connection(username="root", password="l,.7)OCR")
 
-"""
-GENERAL NOTES ABOUT THE WORKSPACE CLASS
-A Workspace instance contains its objects into its self.objects dict.
-As of now, this dict has only three keys: 'items', 'topics' and 'graphs'.
-To access an Item object from the workspace, use self.objects['items'][<wid>] 
-where wid is a String (wid stands for Workspace ID).
-All the wid's must be distinct, even across object types. 
-That is, if an Item and a Topic are both contained in self.objects, then they 
-cannot have same wid.
-"""
-
 
 class Workspace:
-    """Main user interface. Items, topics and graphs are loaded from and saved to the db from this class"""
+    """
+    Main user interface. Items, topics and graphs are loaded from and saved to the db from this class
+
+    GENERAL NOTES ABOUT THE WORKSPACE CLASS
+    A Workspace instance contains its objects into its self.objects dict.
+    As of now, this dict has only three keys: 'items', 'topics' and 'graphs'.
+    To access an Item object from the workspace, use self.objects['items'][<wid>]
+    where wid is a String (wid stands for Workspace ID).
+    All the wid's must be distinct, even across object types.
+    That is, if an Item and a Topic are both contained in self.objects, then they
+    cannot have same wid.
+    """
     # todo: check method add_item(); especially if item is taken from another workspace
     # todo: consider making all the methods private with prefix _
     def __init__(self, connection, dbname="test", interactive=True):
@@ -564,7 +564,7 @@ if __name__ == "__main__":
     # from there, you are good to play with the methods of w and db
 
     # everything from here onwards is for batch mode
-    conn = Connection(username="root", password="l,.7)OCR")
+    conn = Connection(username="root", password="openSesame")
     # create workspace
     # w1 = Workspace(conn, interactive=False)
     #
