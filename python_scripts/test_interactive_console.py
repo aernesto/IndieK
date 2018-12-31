@@ -66,11 +66,8 @@ if __name__ == '__main__':
     # import sys
     # sys.path.extend(['/home/adrian/Git/GitHub/IndieK/python_scripts'])
 
-    # todo: write decorator for all the tests
-
     # create item with unknown item creation mode
     test_1()
 
     # create item with known item creation mode
-
     test_2()
