@@ -28,7 +28,9 @@ from . import __version__ as VERSION
  
 def main():
     """Main CLI entrypoint."""
-    import commands
+#    import sys
+#    print(sys.path)
+    import indiek.cli.commands as commands
     options = docopt(__doc__, version=VERSION)
  
     # Here we'll try to dynamically match the command the user is trying to run
