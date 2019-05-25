@@ -39,6 +39,7 @@ To only run a specific test, type:
     $ python -m unittest -v tests.test_cli
 
 or
+
 ::
 
     $ python -m unittest -v tests.commands.test_hello
