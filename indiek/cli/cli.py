@@ -34,11 +34,13 @@ def main():
 #    print(sys.path)
     import indiek.cli.commands as commands
     options = docopt(__doc__, version=VERSION)
- 
+#    print(options)
+
     # Here we'll try to dynamically match the command the user is trying to run
     # with a pre-defined command class we've already created.
     for k, v in options.items():
-        if hasattr(commands, k):
+        if v and hasattr(commands, k):
+ #           print(k)
             module = getattr(commands, k)
             commands = getmembers(module, isclass)
             command = [command[1] for command in commands if command[0] != 'Base'][0]

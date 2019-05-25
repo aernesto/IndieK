@@ -1,4 +1,4 @@
-"""Tests for our `skele hello` subcommand."""
+"""Tests for our `ik hello` subcommand."""
 
 
 from subprocess import PIPE, Popen as popen
