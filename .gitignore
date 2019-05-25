@@ -3,3 +3,7 @@ python_scripts/.idea/*
 python_scripts/__pycache__/*
 tests/__pycache__/*
 tests/commands/__pycache__/*
+indiek/cli/__pycache__/*
+indiek/cli/commands/__pycache__/*
+.coverage
+indiek.cli.egg-info/*

@@ -3,6 +3,7 @@ ik
  
 Usage:
   ik hello
+  ik bye
   ik -h | --help
   ik --version
  
@@ -12,6 +13,7 @@ Options:
  
 Examples:
   ik hello
+  ik bye
  
 Help:
   For help using this tool, please open an issue on the Github repository:
