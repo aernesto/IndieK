@@ -1,4 +1,4 @@
-"""Tests for our main skele CLI module."""
+"""Tests for our main indiek.cli module."""
 
 
 from subprocess import PIPE, Popen
