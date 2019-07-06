@@ -7,3 +7,4 @@ indiek/cli/__pycache__/*
 indiek/cli/commands/__pycache__/*
 .coverage
 indiek.cli.egg-info/*
+indiek/cli/__pycache__/*
