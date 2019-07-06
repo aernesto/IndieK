@@ -3,6 +3,7 @@ ik
  
 Usage:
   ik hello
+  ik lstopics
   ik bye
   ik -h | --help
   ik --version
@@ -14,6 +15,7 @@ Options:
 Examples:
   ik hello
   ik bye
+  ik lstopics
  
 Help:
   For help using this tool, please open an issue on the Github repository:
@@ -34,15 +36,18 @@ def main():
 #    print(sys.path)
     import indiek.cli.commands as commands
     options = docopt(__doc__, version=VERSION)
-#    print(options)
+    print(options)
 
     # Here we'll try to dynamically match the command the user is trying to run
     # with a pre-defined command class we've already created.
     for k, v in options.items():
         if v and hasattr(commands, k):
- #           print(k)
+            print(k)
             module = getattr(commands, k)
             commands = getmembers(module, isclass)
+            print(commands)
             command = [command[1] for command in commands if command[0] != 'Base'][0]
+            print(type(command))
+            print(command)
             command = command(options)
             command.run()
