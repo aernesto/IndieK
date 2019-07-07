@@ -34,20 +34,21 @@ def main():
     """Main CLI entrypoint."""
 #    import sys
 #    print(sys.path)
-    import indiek.cli.commands as commands
+    import indiek.cli.commands as commands  # each command lives in a file with same name
     options = docopt(__doc__, version=VERSION)
-    print(options)
+    # print(options)
 
     # Here we'll try to dynamically match the command the user is trying to run
     # with a pre-defined command class we've already created.
     for k, v in options.items():
         if v and hasattr(commands, k):
-            print(k)
-            module = getattr(commands, k)
-            commands = getmembers(module, isclass)
-            print(commands)
-            command = [command[1] for command in commands if command[0] != 'Base'][0]
-            print(type(command))
-            print(command)
+            # print(k)  # k here is the command as a string, e.g. hello or lstopics
+            module = getattr(commands, k)  # this grabs the module with filename identical to the command
+            classes = getmembers(module, isclass)  # list of (class name, class object) pairs
+            # print(classes)
+            command = [c[1] for c in classes if c[0] == k.capitalize()][0]
+            # command = classes_list[0]  # grabs first class, this was not robust
+            # print(type(command))
+            # print(command)
             command = command(options)
             command.run()
